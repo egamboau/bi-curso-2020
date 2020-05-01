@@ -1,0 +1,93 @@
+---
+title: 'Tarea #2 Metodología CRISP-DM'
+author: "Eduardo Gamboa - Esteban García"
+date: "5/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Nota: Debido a la dificultad de obtener datos de negocios, se procede a realizar un caso ficticio.
+
+# Entendimiento del negocio
+
+## Determinar los objetivos de negocio
+
+Una empresa aseguradora de renombre desea expandirse en un mercado nuevo de seguros, del cual hay evidencia que la competencia esta usando. Dicho mercado es la venta de seguros a casas rodantes, es decir, de vehiculos automores que tienen capacidade de poder vivir en los mismos.A fin de poder entrar en el negocio, es necesario crear mercados publicitarios y encontrar un nicho de mercado que pueda ser explotado.
+
+Uno de los posibles planes de la compañía es realizar un escrutinio de los clientes actuales, y poder determinar si es posible que ellos compre el nuevo seguro que se desea. Para esto, se requeire crear un modelo que pueda determinar si, dadas ciertas características geograficas y de estado, puedan comprar el seguro o no. 
+
+### Objetivos de negocio
+
+Hay dos objetivos primordiales para el negocio, los cuales se pueden solventar con el diseño descrito en este documento. Estos son: 
+
+1. Poder determinar si algun cliente actual es un posible comprador del nuevo seguro
+
+2. Poder determinar, por medio de una aplicación en los equipos de ventas, si un nuevo cliente puede ser un nuevo comprador potencial del nuevo seguro de caravanas. 
+
+### Criterios de éxito (en términos de negocio)
+
+Para considerar este proyecto exitoso desde el punto de vista del negocio, se debe de poder determinar si la persona que se enstrevista o estudia es un cliente potencial del seguro de caravans, basado en los patrones de otros clientes que tienen dicho producto de la competencia. Primeramente, se desea hacer un plan piloto con los clientes actuales, realizando un estudio de quienes tienen una caravana, y basado en el modelo, predecir si desean un seguro o no. 
+
+## Evaluación de la situación actual
+
+### Inventario de recursos (datos, personal, TI)
+
+Debido a que la compañia aseguradora no posee un seguro de caravanas, no existen datos que puedan usarse como predicción a nivel interno. Sin embargo, como parte del esfuerzo del estudio de mercado, se tienen datos de encuestas y geográficos de clientes actuales de otras aseguradoras, que si ofrecen el producto. Dichos datos son públicos, por lo que es posible utilizarlos dentro de esta compañía.
+
+Se cuenta además con dos personas que trabajan en el análisis de datos y crearán los modelos respectivos basado en los mimos, a nivel de prototipo.
+
+### Requerimientos
+Para este proyecto, los requermientos se expresan de la siguiente manera:
+
+1. Obtener las variables o atributos que son mas relevantes para poder predecir si un cliente desea o no adquirir un seguro de caravanas
+
+2. Dadas dichas variables para una persona cualquiera, determinar si la misma podría estar inclinada a comprar el seguro de caravanas. 
+
+Ambos requerimientos cumplen con los objetivos que se plantearon anteriormente, además de ayudar al esfuerzo de estudio de mercado. 
+
+### Supuestos
+
+En este caso en particular, se supone que los datos tomados son estádisticamente variados, dado que los mismos fueron recolectados por una compañia externa, no se tiene control sobre los mismos. Además se supone que dicha compañia no realizó modificación alguna de los datos fuente, y que los mismos reflejan las intenciones de los clientes y sus localizaciones. 
+
+### Restricciones
+
+Una restricción importante de este proyecto es que los datos y resultados no deben de salir de la compañia. Esto cubre incluso si los resultados no son los deseados, pues se contienen datos geograficos y otros indicadores que pueden considerarse privados por ciertos encuestados, aun cuando ellos aprobaron la utilización de dicha información
+
+### Riesgos y contingencias
+
+Como toda recoleccion de datos, es posible que los datos esten sucios o mal formateados, debido a errores humanos al realizar la digitalización de los mismos. Se analizará  los datos que se obtuvieron con el fin de poder mitigar este riesgo, y realizar la imputación de los datos en caso de ser necesario. 
+
+Otro riesgo que se puede correr es el hecho de que los clientes mientan en algunas de sus preguntas. Esto es mitigado por el hecho de que es posible que sea un porcentaje pequeño. Al particionar los datos de manera aleatoria, se espera que dichos registros se difuminen y que no afecten de manera negativa el modelo. 
+
+### Beneficios
+
+El beneficio mas grande de este proyecto para la compañia es que va a ayudar a analizar un nuevo producto y mercado, del cual aun no se tiene experiencia, y asi aumentar la cartera de clientes. Otro beneficio es que da a los ejecutivos de ventas otra herramienta para poder bridar mas productos a los clientes actuales. 
+
+## Determinar los objetivos de minería de datos
+
+### Objetivos de minería de datos
+
+### Criterios de éxito (desde la perspectiva de minería de datos)
+
+## Plan del proyecto
+
+### Evaluación inicial de herramientas y técnicas
+
+### Plan del proyecto (incluya para cada fase los recursos necesarios,tiempo estimado, riesgos y contiengencias)
+		
+# Fase de entendimiento de los datos
+## Recopilación inicial de datos
+### Lista de datasets requeridos
+### Ubicación de los datasets
+### Método de acceso
+## Descripción de los datos
+
+Identifique uno de los datasets de la lista anterior, incluya: Descripción general de los datos, cantidad de registros,descripción y tipo de datos de los campos más relevantes.
+
+## Exploración de los datos
+### Para dos variables que considere claves, haga una exploración inicial de los datos. Ej: estadísticas básicas sobre la variable, distribución.
+## Calidad de los datos
+Identifique si existen problemas de calidad de datos en uno o varios de los datasets requeridos y las posibles soluciones.
