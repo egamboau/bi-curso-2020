@@ -70,16 +70,37 @@ El beneficio mas grande de este proyecto para la compañia es que va a ayudar a 
 
 ### Objetivos de minería de datos
 
+Desde el punto de vista de la minería de datos, se desea cumplir con un objetivo principal, el cual es realizar una predicción correcta de un cliente, basado en los datos de entrenamiento y de pruebas que fueron otorgados. 
+
+Tambien se espera un análisis de relevancia de las variables que se recolectaron, a fin de poder determinar cuales son las mas relevantes, y cuales pueden ser eliminadas al ser redundantes.
+
 ### Criterios de éxito (desde la perspectiva de minería de datos)
+
+Desde la perspectiva de la minería de datos, se espera poder realizar predicciones on una alta confianza, de al menos un 90%, a fin de poder garantizar que se cumplan los requerimientos de la compañia tanto en el nivel estadístico como en el nivel de exactitud esperado.
 
 ## Plan del proyecto
 
 ### Evaluación inicial de herramientas y técnicas
 
+Para la realización de este proyecto, utilizarán  las siguientes herramientas:
+
+- el lenguaje de programación R, a fin de analizar los datos, y el prototipado de los modelos a utilizar. 
+
 ### Plan del proyecto (incluya para cada fase los recursos necesarios,tiempo estimado, riesgos y contiengencias)
+
+El plan general de este proyecto se especifica a continuación:
+
+Fase                                            | Recursos Necesarios        |Tiempo Estimado | Riesgos y Contingencias
+------------------------------------------------| ---------------------------|----------------|---------------------------------------------------------------------------------------
+Carga de datos                                  | 2 personas, 2 computadoras | 1 día          | El formato de los datos puede no ser el correcto. Se puede solicitar un reenvio de los mismos con el formato deseado
+Análisis de los datos                           | 2 personas, 2 computadoras | 3 dias         | El proceso de carga y análisis puede ser extenso basado en las fuentes de datos, es posible realizar esto con mas equipo de ser necesario.
+Creación y entrenamiento de los modelos de datos| 2 personas, 2 computadoras | 3 dias         | Algunos modelos pensados pueden no adaptarse a los datos, lo que puede significar imputación o transformaciones de datos que no son esperados.
 		
 # Fase de entendimiento de los datos
 ## Recopilación inicial de datos
+
+Los datos iniciales fueron entregados en formato CSV, e incluyen varios 
+
 ### Lista de datasets requeridos
 ### Ubicación de los datasets
 ### Método de acceso
