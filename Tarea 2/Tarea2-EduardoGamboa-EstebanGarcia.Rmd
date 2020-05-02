@@ -99,14 +99,18 @@ Creación y entrenamiento de los modelos de datos| 2 personas, 2 computadoras | 
 # Fase de entendimiento de los datos
 ## Recopilación inicial de datos
 
-Los datos iniciales fueron entregados en formato CSV, e incluyen varios 
+Los datos iniciales fueron entregados en formato CSV, e incluyen varias entradas de las personas encuestadas, con datos personales y de contexto geográfico. 
 
 ### Lista de datasets requeridos
+Solamente es requerido un data set, el cual es otorgado por terceros, que incluye las encuestas de las personas que tienen caravanas, y que tienen o no tienen seguros para las mismas. 
 ### Ubicación de los datasets
+El dataset se encuentra en formato CSV el cual esta localizado en los servidores de la comañía de seguros. Se tiene acceso para la descarga de ellos hacia las computadoras locales para su procesamiento, siempre que los mismos no salgan de dichos equipos. 
+
 ### Método de acceso
+Se accesan los datos directamente, desde un archivo de texto delimitado por comas, almacenado en los equipos locales de la compañia. 
+
 ## Descripción de los datos
 
-Identifique uno de los datasets de la lista anterior, incluya: Descripción general de los datos, cantidad de registros,descripción y tipo de datos de los campos más relevantes.
 
 ## Exploración de los datos
 ### Para dos variables que considere claves, haga una exploración inicial de los datos. Ej: estadísticas básicas sobre la variable, distribución.
