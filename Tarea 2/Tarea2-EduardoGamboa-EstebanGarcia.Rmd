@@ -15,34 +15,34 @@ Nota: Debido a la dificultad de obtener datos de negocios, se procede a realizar
 
 ## Determinar los objetivos de negocio
 
-Una empresa aseguradora de renombre desea expandirse en un mercado nuevo de seguros, del cual hay evidencia que la competencia esta usando. Dicho mercado es la venta de seguros a casas rodantes, es decir, de vehiculos automores que tienen capacidade de poder vivir en los mismos.A fin de poder entrar en el negocio, es necesario crear mercados publicitarios y encontrar un nicho de mercado que pueda ser explotado.
+Una empresa aseguradora de renombre desea expandirse en un mercado nuevo de seguros, del cual hay evidencia que la competencia está usando. Dicho mercado es la venta de seguros a casas rodantes, es decir, de vehículos automotores que tienen capacidad de poder vivir en los mismos. A fin de poder entrar en el negocio, es necesario crear mercados publicitarios y encontrar un nicho de mercado que pueda ser explotado.
 
-Uno de los posibles planes de la compañía es realizar un escrutinio de los clientes actuales, y poder determinar si es posible que ellos compre el nuevo seguro que se desea. Para esto, se requeire crear un modelo que pueda determinar si, dadas ciertas características geograficas y de estado, puedan comprar el seguro o no. 
+Uno de los posibles planes de la compañía es realizar un escrutinio de los clientes actuales, y poder determinar si es posible que ellos compren el nuevo seguro que se desea. Para esto, se requiere crear un modelo que pueda determinar si, dadas ciertas características geográficas y de estado, puedan comprar el seguro o no. 
 
 ### Objetivos de negocio
 
 Hay dos objetivos primordiales para el negocio, los cuales se pueden solventar con el diseño descrito en este documento. Estos son: 
 
-1. Poder determinar si algun cliente actual es un posible comprador del nuevo seguro
+1. Poder determinar si algún cliente actual es un posible comprador del nuevo seguro
 
 2. Poder determinar, por medio de una aplicación en los equipos de ventas, si un nuevo cliente puede ser un nuevo comprador potencial del nuevo seguro de caravanas. 
 
 ### Criterios de éxito (en términos de negocio)
 
-Para considerar este proyecto exitoso desde el punto de vista del negocio, se debe de poder determinar si la persona que se enstrevista o estudia es un cliente potencial del seguro de caravans, basado en los patrones de otros clientes que tienen dicho producto de la competencia. Primeramente, se desea hacer un plan piloto con los clientes actuales, realizando un estudio de quienes tienen una caravana, y basado en el modelo, predecir si desean un seguro o no. 
+Para considerar este proyecto exitoso desde el punto de vista del negocio, se debe de poder determinar si la persona que se entrevista o estudia es un cliente potencial del seguro de caravanas, basado en los patrones de otros clientes que tienen dicho producto de la competencia. Primeramente, se desea hacer un plan piloto con los clientes actuales, realizando un estudio de quienes tienen una caravana, y basado en el modelo, predecir si desean un seguro o no. 
 
 ## Evaluación de la situación actual
 
 ### Inventario de recursos (datos, personal, TI)
 
-Debido a que la compañia aseguradora no posee un seguro de caravanas, no existen datos que puedan usarse como predicción a nivel interno. Sin embargo, como parte del esfuerzo del estudio de mercado, se tienen datos de encuestas y geográficos de clientes actuales de otras aseguradoras, que si ofrecen el producto. Dichos datos son públicos, por lo que es posible utilizarlos dentro de esta compañía.
+Debido a que la compañía aseguradora no posee un seguro de caravanas, no existen datos que puedan usarse como predicción a nivel interno. Sin embargo, como parte del esfuerzo del estudio de mercado, se tienen datos de encuestas y geográficos de clientes actuales de otras aseguradoras, que si ofrecen el producto. Dichos datos son públicos, por lo que es posible utilizarlos dentro de esta compañía.
 
 Se cuenta además con dos personas que trabajan en el análisis de datos y crearán los modelos respectivos basado en los mimos, a nivel de prototipo.
 
 ### Requerimientos
-Para este proyecto, los requermientos se expresan de la siguiente manera:
+Para este proyecto, los requerimientos se expresan de la siguiente manera:
 
-1. Obtener las variables o atributos que son mas relevantes para poder predecir si un cliente desea o no adquirir un seguro de caravanas
+1. Obtener las variables o atributos que son más relevantes para poder predecir si un cliente desea o no adquirir un seguro de caravanas
 
 2. Dadas dichas variables para una persona cualquiera, determinar si la misma podría estar inclinada a comprar el seguro de caravanas. 
 
