@@ -110,9 +110,292 @@ El dataset se encuentra en formato CSV el cual esta localizado en los servidores
 Se accesan los datos directamente, desde un archivo de texto delimitado por comas, almacenado en los equipos locales de la compañia. 
 
 ## Descripción de los datos
+A continuación un diccionario de datos, los cuales serán los analizados en este trabajo:
 
+1. MOSTYPE Tipo de cliente. Categórica. Los posibles valores son:
+    1. Ingreso alto, con niños caros
+    2. Provinciano muy importante
+    3. Ancianos de alto estado social
+    4. Ancianos aluentes con apartamentos
+    5. Ancianos mezclados
+    6. Cuidadores, ya sea de adultos o de niños
+    7. Doble ingreso, sin niños
+    8. Familias clase media
+    9. Familias modernas completas
+    10. Familias estables
+    11. FAmilias iniciando
+    12. Familias jóvenes afluentes
+    13. Familia joven, todos estadounidenses
+    14. Cosmopolita joven
+    15. Cosmopolita anciano
+    16. Estudiantes en apartamentos
+    17. Recién graduados en la ciudad
+    18. Joven soltero
+    19. Joven suburbano
+    20. Étnicamente diverso
+    21. Joven urbano sin beneficios materiales
+    22. Varias personas que viven en apartamentos
+    23. Jóvenes y creciendo
+    24. Jóvenes, baja educación
+    25. Ancianos jóvenes en la ciudad
+    26. Ancianos dueños de casa
+    27. Ancianos en apartamentos
+    28. Ancianos residenciales
+    29. Ancianos sin patio delantero
+    30. Ancianos solteros religiosos
+    31. Católicos con bajo ingreso
+    32. Ancianos mezclados
+    33. Familias largas de baja clase
+    34. Familias largas, con hijos empleados
+    35. Familias de villas
+    36. Familia con adolescentes
+    37. Habitantes mezclados de pueblos pequeños
+    38. Familia tradicional
+    39. Familias religiosas largas
+    40  Largas Familia de granjas
+    41. Rurales mezcladas
+
+2. MAANTHUI Número de casas, de 1 a 10
+3. MGEMOMV Tamaño promedio de casa, de 1 a 6
+4. MGEMLEEF Edad promedio.
+    1. 20-30 años
+    2. 30-40 años
+    3. 40-50 años
+    4. 50-60 años
+    5. 60-70 años
+    6. 70-80 años
+5. MOSHOOFD Categórica. Tipo de cliente principal.
+    1. Hedonista exitoso
+    2. Granjero conducido
+    3. Familia Promedio
+    4. Deudor de prestamos para carreras
+    5. Viviendo bien
+    6. Ancianos viajeros
+    7. Retirados y religiosos
+    8. Familia con personas adultas
+    9. Familias conservativas
+    10. Granjeros
+6. MGODRK Católicos romanos
+7. MGODPR Protestantes
+8. MGODOV Otra religion
+9. MGODGE Sin Religion
+10. MRELGE Casado
+11. MRELSA Viviendo Juntos
+12. MRELOV Otra relación
+13. MFALLEEN Solteros
+14. MFGEKIND Ocupantes de casa sin niños
+15. MFWEKIND Ocupantes de casa sin niños
+16. MOPLHOOG Educación de alto nivel
+17. MOPLMIDD Educación media
+18. MOPLLAAG Educación baja
+19. MBERHOOG Alto estatus
+20. MBERZELF Emprendedor
+21. MBERBOER Granjero
+22. MBERMIDD Administrador medio
+23. MBERARBG Trabajador con habilidades
+24. MBERARBO Trabajador sin habilidades
+25. MSKA Clase social A
+26. MSKB1 Clase social B1
+27. MSKB2 Clase social B2
+28. MSKC Clase social C
+29. MSKD Clase social D
+30. MHHUUR Casa rentada
+31. MHKOOP Dueños de casa
+32. MAUT1 1 auto
+33. MAUT2 2 autos
+34. MAUT0 Sin autos
+35. MZFONDS Servicio nacional de salud
+36. MZPART Seguro de salud privado
+37. MINKM30 Ingreso menor de  30.000
+38. MINK3045 Ingreso entre 30-45.000
+39. MINK4575 Ingreso entre 45-75.000
+40. MINK7512 Ingreso entre 75-122.000
+41. MINK123M Ingreso mayor que 123.000
+42. MINKGEM Ingreso promedio
+43. MKOOPKLA Clase de poder de compra
+44. PWAPART Contribución de seguros de terceros
+45. PWABEDR Contribución de seguros de terceros
+46. PWALAND Contribución de seguros de terceros en agricultura
+47. PPERSAUT Contribución en contratos de seguros de automóviles
+48. PBESAUT Contribución en contratos de seguros en camionetas de entrega
+49. PMOTSCO Contribución en contratos de seguros  motocicletas
+50. PVRAAUT Contribución en contratos de seguros  de camiones
+51. PAANHANG Contribución en contratos de seguros de trailers
+52. PTRACTOR Contribución en contratos de seguros  de tractores
+53. PWERKT Contribución en contratos de seguros  de maquinas de agrcultura
+54. PBROM Contribución en contratos de seguros  motocicletas pequeñas
+55. PLEVEN Contribución de seguros de vida
+56. PPERSONG Contribución en contratos de seguros de accidentes privados
+57. PGEZONG Contribución en contratos de seguros de accidentes de famiia
+58. PWAOREG Contrato de seguros de contribución de invalidez
+59. PBRAND Contrato de seguros de contribución de seguros contra incendios
+60. PZEILPL Contrato de seguros de contribución en seguros de tablas de surf
+61. PPLEZIER Contrato de seguros de contribución en seguros de botes
+62. PFIETS Contrato de seguros de contribución en seguros de bicicletas
+63. PINBOED Contrato de seguros de contribución de seguros de propiedades
+64. PBYSTAND Contrato de seguros de contribución de seguro social
+65. AWAPART Número de seguros de terceros 
+66. AWABEDR Número de firmas de seguros de terceras personas
+67. AWALAND Número de seguros de terceras personas
+68. APERSAUT Número de contratos de seguros de automóviles
+69. ABESAUT Número de contratos de seguros de camionetas de entrega
+70. AMOTSCO Número de contratos de seguros de motocicletas o scooter
+71. AVRAAUT Número de contratos de seguros de camiones
+72. AAANHANG Número de contratos de seguros de trailer
+73. ATRACTOR Número de contratos de seguros tractor
+74. AWERKT Número de contratos de seguros de maquinaria de agricultura
+75. ABROM Número de contratos de seguros en moticicletas pequeñas
+76. ALEVEN Número de seguros de vida
+77. APERSONG Número de contratos de seguros de accidente privado
+78. AGEZONG Número de contratos de seguros de accidentes familiares
+79. AWAOREG Número de contratos de seguros de invalidez familiares
+80. ABRAND Número de contratos de seguros de incendios
+81. AZEILPL Número de contratos de seguros de tablas de surf
+82. APLEZIER Número de contratos de seguros de botes
+83. AFIETS Número de contratos de seguros de bicicletas
+84. AINBOED Número de contratos de seguros de propiedades
+85. ABYSTAND Número de contratos de seguros de seguro social
+86. CARAVAN Número de contratos de casas móviles. 0 o 1.
+
+Además, como notas aclaratorias:
+
+1. Las variables que inician con M son variables de área, no específicas del cliente. Se basan en el código ZIP donde el cliente está ubicado, y reflejan la distribución de la variable en cuestión
+1. Las siguientes columnas comparten su dominio, los valores que solo pertenecen a una sola columna están especificados en la lista anterior:
+    1. Columnas de la 7 a la 42, todas estas se comportan como porcentajes. Los valores se especifican a continuación:
+        0. 0%
+        1. 1 - 10%
+        2. 11 - 23%
+        3. 24 - 36%
+        4. 37 - 49%
+        5. 50 - 62%
+        6. 63 - 75%
+        7. 76 - 88%
+        8. 89 - 99%
+        9. 100%
+    1. Las columnas de la 43 a la 64, todas son valores monetarios. Sus posibles valores son:
+        0. 0
+        1. 1 a 49
+        2. 50 a 99
+        3. 100 a 199
+        4. 200 a 499
+        5. 500 a 999
+        6. 1000 a 4999
+        7. 5000 a 9999
+        8. 10.000 a 19.999
+        9. 20.000 o mayor
+    1. Las columnas de la 65  a la 85, son numéricas, con rango de 1 a 12
 
 ## Exploración de los datos
-### Para dos variables que considere claves, haga una exploración inicial de los datos. Ej: estadísticas básicas sobre la variable, distribución.
+
+Se procede a la carga de los datos
+```{r carga_datos}
+columnas = c('MOSTYPE', 'MAANTHUI', 'MGEMOMV', 'MGEMLEEF', 'MOSHOOFD', 'MGODRK', 'MGODPR', 'MGODOV', 'MGODGE', 'MRELGE', 'MRELSA', 'MRELOV', 'MFALLEEN', 'MFGEKIND', 'MFWEKIND', 'MOPLHOOG', 'MOPLMIDD', 'MOPLLAAG', 'MBERHOOG', 'MBERZELF', 'MBERBOER', 'MBERMIDD', 'MBERARBG', 'MBERARBO', 'MSKA', 'MSKB1', 'MSKB2', 'MSKC', 'MSKD', 'MHHUUR', 'MHKOOP', 'MAUT1', 'MAUT2', 'MAUT0', 'MZFONDS', 'MZPART', 'MINKM30', 'MINK3045', 'MINK4575', 'MINK7512', 'MINK123M', 'MINKGEM', 'MKOOPKLA', 'PWAPART', 'PWABEDR', 'PWALAND', 'PPERSAUT', 'PBESAUT', 'PMOTSCO', 'PVRAAUT', 'PAANHANG', 'PTRACTOR', 'PWERKT', 'PBROM', 'PLEVEN', 'PPERSONG', 'PGEZONG', 'PWAOREG', 'PBRAND', 'PZEILPL', 'PPLEZIER', 'PFIETS', 'PINBOED', 'PBYSTAND', 'AWAPART', 'AWABEDR', 'AWALAND', 'APERSAUT', 'ABESAUT', 'AMOTSCO', 'AVRAAUT', 'AAANHANG', 'ATRACTOR', 'AWERKT', 'ABROM', 'ALEVEN', 'APERSONG', 'AGEZONG', 'AWAOREG', 'ABRAND', 'AZEILPL', 'APLEZIER', 'AFIETS', 'AINBOED', 'ABYSTAND', 'CARAVAN')
+datos = read.table('ticdata2000.txt', header = F, col.names = columnas)
+datos$MOSTYPE <- factor(datos$MOSTYPE)
+datos$MGEMLEEF <- factor(datos$MGEMLEEF)
+datos$MOSHOOFD <- factor(datos$MOSHOOFD)
+datos$MGODRK <- factor(datos$MGODRK)
+datos$MGODPR <- factor(datos$MGODPR)
+datos$MGODOV <- factor(datos$MGODOV)
+datos$MGODGE <- factor(datos$MGODGE)
+datos$MRELGE <- factor(datos$MRELGE)
+datos$MRELSA <- factor(datos$MRELSA)
+datos$MRELOV <- factor(datos$MRELOV)
+datos$MFALLEEN <- factor(datos$MFALLEEN)
+datos$MFGEKIND <- factor(datos$MFGEKIND)
+datos$MFWEKIND <- factor(datos$MFWEKIND)
+datos$MOPLHOOG <- factor(datos$MOPLHOOG)
+datos$MOPLMIDD <- factor(datos$MOPLMIDD)
+datos$MOPLLAAG <- factor(datos$MOPLLAAG)
+datos$MBERHOOG <- factor(datos$MBERHOOG)
+datos$MBERZELF <- factor(datos$MBERZELF)
+datos$MBERBOER <- factor(datos$MBERBOER)
+datos$MBERMIDD <- factor(datos$MBERMIDD)
+datos$MBERARBG <- factor(datos$MBERARBG)
+datos$MBERARBO <- factor(datos$MBERARBO)
+datos$MSKA <- factor(datos$MSKA)
+datos$MSKB1 <- factor(datos$MSKB1)
+datos$MSKB2 <- factor(datos$MSKB2)
+datos$MSKC <- factor(datos$MSKC)
+datos$MSKD <- factor(datos$MSKD)
+datos$MHHUUR <- factor(datos$MHHUUR)
+datos$MHKOOP <- factor(datos$MHKOOP)
+datos$MAUT1 <- factor(datos$MAUT1)
+datos$MAUT2 <- factor(datos$MAUT2)
+datos$MAUT0 <- factor(datos$MAUT0)
+datos$MZFONDS <- factor(datos$MZFONDS)
+datos$MZPART <- factor(datos$MZPART)
+datos$MINKM30 <- factor(datos$MINKM30)
+datos$MINK3045 <- factor(datos$MINK3045)
+datos$MINK4575 <- factor(datos$MINK4575)
+datos$MINK7512 <- factor(datos$MINK7512)
+datos$MINK123M <- factor(datos$MINK123M)
+datos$MINKGEM <- factor(datos$MINKGEM)
+datos$MKOOPKLA <- factor(datos$MKOOPKLA)
+datos$PWAPART <- factor(datos$PWAPART)
+datos$PWABEDR <- factor(datos$PWABEDR)
+datos$PWALAND <- factor(datos$PWALAND)
+datos$PPERSAUT <- factor(datos$PPERSAUT)
+datos$PBESAUT <- factor(datos$PBESAUT)
+datos$PMOTSCO <- factor(datos$PMOTSCO)
+datos$PVRAAUT <- factor(datos$PVRAAUT)
+datos$PAANHANG <- factor(datos$PAANHANG)
+datos$PTRACTOR <- factor(datos$PTRACTOR)
+datos$PWERKT <- factor(datos$PWERKT)
+datos$PBROM <- factor(datos$PBROM)
+datos$PLEVEN <- factor(datos$PLEVEN)
+datos$PPERSONG <- factor(datos$PPERSONG)
+datos$PGEZONG <- factor(datos$PGEZONG)
+datos$PWAOREG <- factor(datos$PWAOREG)
+datos$PBRAND <- factor(datos$PBRAND)
+datos$PZEILPL <- factor(datos$PZEILPL)
+datos$PPLEZIER <- factor(datos$PPLEZIER)
+datos$PFIETS <- factor(datos$PFIETS)
+datos$PINBOED <- factor(datos$PINBOED)
+datos$PBYSTAND <- factor(datos$PBYSTAND)
+datos$CARAVAN <- factor(datos$CARAVAN)
+```
+
+Se revisa la distribución de los datos a predecir
+```{r distribucion-variable-predecir}
+barplot(table(datos$CARAVAN), 
+        main="Distribución de compra de seguros",
+        xlab = "Compró un seguro", 
+        ylab="Cantidad")
+```
+
+Es claro ver que la gran mayoría de los encuestados no compro un seguro de caravanas. Esto podría generar un modelo que idenfitique un posible nuevo comprador utilizando las diferencias en las variables en cuestión, sin embargo, con una posibilidad mas alta de que retorne falsos positivos. 
+
+Seguidamente, entre los que compraron un seguro de caravanas, se procede a realizar un analisis de los tipos de clientes.
+
+```{r gráfico seguros y clientes que adquirieron seguro}
+compraronSeguros = datos[datos$CARAVAN == 1,]
+barplot(table(compraronSeguros$MOSTYPE),
+        main = "Distribución de tipos de clientes que \ncompraron seguro",
+        xlab = "Tipo de cliente",
+        ylab = "cantidad de clientes")
+```
+
+En este caso, los clientes que mas compraron caravanas son del tipo 33, y del tipo 8. Dichos tipos corresponden al tipo de clase baja con grandes familias, y a las familias de clase media. Es posible observar la misma relación, respecto a los que no adquirieron un seguro: 
+```{r distribucion_clientes_sin_seguro}
+noCompraronSeguros = datos[datos$CARAVAN == 0,]
+barplot(table(noCompraronSeguros$MOSTYPE),
+        main = "Distribución de tipos de clientes que \ncompraron seguro",
+        xlab = "Tipo de cliente",
+        ylab = "cantidad de clientes")
+```
+Para este caso, se observa que la gran mayoria de los que no compraron seguros, son tambien del tipo 33, familias de clase baja con grandes familias. Es de notar que este tipo de clientes tambien compraron un seguro segun la distribución. Sin embargo, la diferencia en la proporción de los datos indica que el tipo de cliente 33 no es un buen indicador 
+
+Otra variable importante que se puede definir es el ingreso de los clientes, pues el ingreso neto de los encuestados puede ser una razon para no comprar un seguro. Es de notar que dicho promedio de ingresos es en la zona donde los encuestados viven
+
+```{r distribucion-ingresos}
+barplot(table(datos$MINKGEM),
+        main = "Distribución de tipos de ingreso promedio por clientes",
+        xlab = "Tipo de ingreso promedio",
+        ylab = "cantidad de clientes")
+```
+
+Lod dos tipos de ingreso mas comunes son el 3 y el 4, que reflejan ingresos en la zona donde se vive con valores entre 24% y 36% (para el caso del valor 3) y un 37% - 49% para el valor 4. 
+
 ## Calidad de los datos
-Identifique si existen problemas de calidad de datos en uno o varios de los datasets requeridos y las posibles soluciones.
+Los datos no contienen variables nulas, sin embargo, la codificación de los mismos es algo confusa segun el diccionario de datos dado. Además, es poible notar que los datos se orientan hacia personas que no compraron caravanas, lo que no da una buena opción de poder predecir personas que si compraron caravanas, esto dado de que el modelo aprendera a predecir casos negativos de manera mas exacta que los positivos. 
