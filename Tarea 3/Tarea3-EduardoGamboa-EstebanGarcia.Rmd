@@ -15,59 +15,66 @@ library(plyr)
 library(ggplot2)
 library(knitr)
 library(lubridate)
+library(comprehenr)
+library(dplyr)
 ```
 
 
 # Entendimiento del negocio
 
 ## Determinar los objetivos de minería de datos
+El objetivo de este programa es lograr encontrar reglas que dicten de manera eficaz cuales grupos van a colaborar entre si por medio de los patrones anteriores. Esto usando herramientas de reglas de asociación descritas poeteriormente en este documento. 
 
 ### Objetivos de minería de datos
 
-TODO
+Los objetivos de minera de datos son:
 
--Encontrar patrones de co-ocurrencia
--Asociar grupos de personas
+* Encontrar patrones de co-ocurrencia con una confianza acetable para el alcalde 
+* Brindar una herramienta que permita predecir con cierta efectividad cuales grupos van a trabajar juntos segun patrones anteriores
 
 ### Criterios de éxito (desde la perspectiva de minería de datos)
 
-TODO
-
--Encontrar Relaciones poco evidentes
+Los criterios de éxtio serían: 
+* Econtrar reglas que tengan una confianza de un 80%
+* Proveer una lista que se pueda seguir facilmente a fin de poder determinar quien puede colaborar con quien
 
 		
 # Fase de entendimiento de los datos
 
-TODO
+El dataset que se explora a continuación tiene las siguientes variables:
 
-## Exploración de los datos
+* *Tiempo_Respuesta*: Cantidad en minutos que la persona tardó completando la encuesta.
+* *Tiempo_comunidad*: Tiempo en años que y 2 años), Medio (entre 3 y 9 años), Largo(10 o más años).
+* *Sexo*: Sexo de la persona encuestada.
+* *Trabaja*: Sí/No, indica si la persona actualmente tiene un trabajo remunerado.
+* *Edad*: Edad en años del encuestado.
+* *Familia*: Sí/No, indica si la persona pertenece a algún grupo orientado a la familia, por ejemplo: deportes, recreación infantil, genealogía, etc.
+* *Hobbies*: Sí/No, indica si la persona pertenece a un grupo relativo a pasatiempos: motociclismo, recreación al aire libre, etc.
+* *Club_Social*: Sí/No, indica si la persona pertenece a algún club, por ejemplo: Club de Leones, etc.
+* *Política*: Sí/No, indica si la persona pertenece a un grupo propio de un partido político.
+* *Profesional*: Sí/No, indica si la persona pertenece a un grupo relacionado con su profesión.
+* *Medioambiente*: Sí/No, indica si la persona pertenece a un grupo para rescate o cuidado del medio ambiente.
+* *Grupo_Apoyo*: Sí/No, indica si la persona pertenece a un grupo de apoyo, por ejemplo Alcohólicos anónimos, Narcóticos anónimos, manejo de la ira, etc..
 
-Se procede a la carga de los datos 
-
-```{r}
-datos<- read.csv('encuesta.csv',sep=',',dec='.',stringsAsFactors = TRUE)
-
-```
-
-```{r}
-head(datos,5)
-```
-
-TODO poner grafiquitos y analisis 
 
 ## Calidad de los datos
 
 Verificamos la cantidad de filas y columnas. Se esperan 12 columnas.
 
 ```{r}
-ncol(datos)
-
-nrow(datos)
-
+datos<- read.csv('encuesta.csv',sep=',',dec='.',stringsAsFactors = TRUE)
+str(datos)
 ```
+
+En este caso, se cargaron `r ncol(datos)` columnas y `r nrow(datos)` filas
+
+Una muestra de los mismos se imprime a continuación
+
 ```{r}
 head(datos,5)
 ```
+
+
 Vemos que los atributos: Familia, Hobbies, Club_Social, Politica, Profesional, Medioambiente y Grupo_Apoyo se cargan como int pero en realidad son categoricos. Se hace la conversion a factor. 
 
 ```{r}
@@ -78,115 +85,255 @@ datos$Politica<-as.factor(datos$Politica)
 datos$Profesional<-as.factor(datos$Profesional)
 datos$Medioambiente<-as.factor(datos$Medioambiente)
 datos$Grupo_Apoyo<-as.factor(datos$Grupo_Apoyo)
+str(datos)
 ```
 
-Buscamos datos nulos
-```{r}
-sum(is.na(datos)) 
-```
 
-Los datos no contienen valores nulos.
+Los datos tienen `r sum(is.na(datos)) ` columnas con valores nulos. No es necesario realizar una limpieza de los mismos
 
-Se verifica que las variables númericas Edad y Tiempo_Respuesta tengan valores consistentes (no negativos y aceptables para el contexto) 
+
+Se verifica que la variable Edad tengan valores consistentes (no negativos y aceptables para el contexto) 
 ```{r}
-summary(select(datos,c("Edad","Tiempo_Respuesta")))
+summary(select(datos,c("Edad")))
 ```
 Edad tiene valores entre 17 y 57 años, lo cual es aceptable
-Tiempo_Respuesta tiene valores entre 2 y 10 minutos
 
 Se verifica los niveles de los factores para validar que no existan errores tipograficos o valores fuera de lo definido en el diccionario, es decir:
 
-Familia, Hobbies, Club_Social, Politica, Profesional, Medioambiente y Grupo_Apoyo: "0", "1"
-Tiempo_comunidad: "Corto", "Largo" y "Medio"
-Sexo: "F" y "M"
+* Familia, Hobbies, Club_Social, Politica, Profesional, Medioambiente y Grupo_Apoyo: "0", "1"
+* Tiempo_comunidad: "Corto", "Largo" y "Medio"
+* Sexo: "F" y "M"
 
 
 ```{r}
 sapply(select(datos,-c("Edad","Tiempo_Respuesta")), levels)
 ```
 
-el formato de todas las entradas es consistente con la definicion del diccionario de datos.
+El formato de todas las entradas es consistente con la definicion del diccionario de datos, por lo que no es requerido realizar arreglos a los datos. 
+
+## Exploración de los datos
+
+Se procede a analizar la edad de los encuestados
+```{r}
+barplot(table(datos$Edad), main = "Edad de los encuestados", xlab = "Edad", ylab="Encuestados")
+```
+
+Es claro observar que la edad de los cuenstados esta distribuida de manera casi regular, sn embargo, hay pocas persona menores de 20 años y mayores de 56. 
+
+Haciendo el mismo análisis alrededor del sexo de la persona:
+```{r}
+barplot(table(datos$Sexo), main = "Sexo de los encuestados", xlab = "Sexo", ylab="Encuestados")
+```
+Se puede ver que la encuesta esta bien distribuida, con casi un 50% de personas en cada sexo, si bien es cierto, hay un poco mas de encuestados del sexo femenino, la diferencia no es notable en la visualización. 
+
+Se analiza además cuales son tiempos en los cuales las personas encuestadas viven en la comunidad:
+```{r}
+barplot(table(datos$Tiempo_comunidad), main = "Tiempo en la comunidad de los encuestados", xlab = "Tiempo", ylab="Encuestados")
+```
+
+La gran mayoría de los encuestados llevan un largo tiempo viviendo en la comunidad, lo que puede lleger a ser un determinante a la hora de generar las reglas de asociación. 
+
+Por su parte, para verificar que los encuestados trabajan o no: 
+
+```{r}
+barplot(table(datos$Trabaja), main = "Cantidad de encuestados que trabajan", xlab = "Tiene trabajo", ylab="Encuestados")
+```
+
+En este caso, el 50% de los encuentados trbaja, mientras el otro 50% no lo hace. 
+
+Finalmente un conteo de las personas asociadas a cada grupo
+
+```{r}
+columnas <- c("Familia", "Hobbies", "Club_Social", "Politica", "Profesional", "Medioambiente", "Grupo_Apoyo")
+conteo_grupos = to_vec(for (col in columnas) nrow(datos[which(datos[col] == 1),]))
+
+barplot(height = conteo_grupos, names.arg = columnas, las=2)
+```
+
+Es claro que el grupo mas popular es el de medio ambiente. Seguido por grupos de familia. El menos popular, es el grupo de política. 
+
 
 # Preparación de los datos
 
 ## Selección de los datos
-TODO
-seleccion y porque
+Se tomarán todas las columnas referentes a las personas, y a los grupos de las mismas. Simplement se elimina la variable del tiempo de respuesta de la encuesta. La misma no es relevante a los objetivos del proyecto, y mas bien es usada para medir el tiempo que tomó la encuesta en sí, y no los grupos a los que las personas pertenecen
+
+```{r}
+datos$Tiempo_Respuesta <- NULL
+```
 
 ## Limpieza de los datos
-los datos estan limpios
+Los datos se encuentran en el formato idóneo para las técnicas a utilizar
 
 ## Construcción de nuevos datos (atributos)
-No es necesario crear nuevos datos
+En el caso de la edad, una diferencia de un año podría no ser relevante. A fin de poder hacer un manejo un poco mas exacto, se procede a crear un nuevo atributo, rango_edad, con 3 posibles valores: 
 
+* Adolescentes: Personas menores de 18 años
+* Adultos Jóvenes: Personas entre 18 y 30 años
+* Adulto Medios: Personas entre 30 y 60 años
+* Adulto mayor: Personas con mas de 60 años
+
+``` {r}
+
+ datos <- datos %>% mutate(rango_edad = case_when(datos$Edad < 18 ~ "adolescente",
+                                                datos$Edad >= 18 & datos$Edad < 30 ~"adulto_joven",
+                                                datos$Edad >= 30 & datos$Edad < 60 ~"adulto_medio",
+                                                datos$Edad >= 60 ~"adulto_mayor",))
+
+datos$rango_edad = as.factor(datos$rango_edad)
+
+summary(datos$rango_edad)
+```
 
 ## Transformaciones aplicadas a los datos
-TODO
-Transformar Edad y Tiempo_Respuesta a rangos
+Tal y como se menciona durante la exploración de los datos, se realiza un cambio de tipo a las variables numéricas a factores, asi pueden ser tratadas como tales. 
 
 # Fase de modelado
 
 ## Selección de técnicas
-A priori, pre definida por el contexto de la tarea
+A fin de poder obtener un conjunto de reglas, se utiliza el modelo "a priori" con difernetes valores de confianza y de soporte para obtener las reglas
 
 ## Construcción del modelo
 
 Se generan y analisan dos conjuntos de reglas
 
 ### Conjunto 1
+
 #### Selección de parámetros:
-soporte
-confianza
-tamaño de la regla
 
-#### Ejecución
-Generar reglas
-
-```{r}
-transac<-as(datos[,c(2,3,4,6,7,8,9,10,11,12)],'transactions')
-
-reglas<-apriori(transac, parameter = list(supp=0.1,conf=0.85,maxlen=10))
-
-inspect(reglas[1:10])
+Como parte del proceso, se realiza una selección de los parametros, tanto del soporte, como la confianza y el tamaño de las reglas en general, a fin de analizar las mismas
+``` {r}
+soporte <- 0.1
+confianza <- 0.85
+tamagnoRegla <- 10
 ```
 
 
-Eliminar subconjuntos
+#### Ejecución
+Se generan las reglas a continuación 
+
+```{r}
+columnas_transaccion <- c("Familia", "Hobbies", "Club_Social", "Politica", "Profesional", "Medioambiente", "Grupo_Apoyo", "Tiempo_comunidad", "Sexo", "Trabaja", "rango_edad")
+transac<-as(datos[,columnas_transaccion],'transactions')
+
+summary(transac)
+```
+
+```{r}
+reglas<-apriori(transac, parameter = list(supp=soporte,conf=confianza,maxlen=tamagnoRegla))
+
+inspect(reglas[1:20])
+```
+
+Se procede a eliminar subconjuntos de las reglas, a fin de tener los patrones únicos
 ```{r}
 # eliminar reglas que son subconjuntos de otras 
 subconjuntos<- which(colSums(is.subset(reglas,reglas))>1)
   
 reglasFinal<- reglas[-subconjuntos]
-
-
 # se ordena por soporte y se observan las primeras 10 reglas
 inspect(sort(reglasFinal,by='support',decreasing = TRUE)[1:10])
 ```
 #### Descripción de las reglas
-generar gráfico
-
+Se procede a visualizar las reglas que se tienen, mayores que la confianza que se definió durante la generacion
 
 ```{r fig.align='center'}
-# se filtran las reglas con confianza superior a 0.85
-mejoresReglas<- reglasFinal[quality(reglasFinal)$confidence>0.85]
+mejoresReglas<- reglasFinal[quality(reglasFinal)$confidence>confianza]
 
 cincoMejoresReglas<- head(mejoresReglas,n=5,by='confidence')
   
 plot(cincoMejoresReglas,method = 'graph',engine = 'htmlwidget')
 
 ```
+
+
 ```{r fig.align='center'}
-  Top10<-head(mejoresReglas,n=10,by='confidence')
+Top10<-head(mejoresReglas,n=10,by='confidence')
   
-  plot(Top10,method ='paracoord')
+plot(Top10,method ='paracoord')
 ```
+
 #### Evaluación del modelo
-mostrar y analizar las tres mejores reglas
 
+Se analizan a continuación las 3 primeras reglas:
+``` {r}
+inspect(Top10[1])
+```
 
+En esta regla, se india que si una persona no forma parte de algún club relevante al medio ambiente, no formará parte tampoco a ningún club con caracter social
+
+``` {r}
+inspect(Top10[2])
+```
+
+En este caso, si una persona determinada no esta en un grupo de Hobbies, tampoco estará asociada a un curso de Clubes socuales
+
+``` {r}
+inspect(Top10[3])
+```
+
+Finalmente, esta regla indica que, con una confianza del 90%, nadie se va a unira grupos de política. Esto debido a que ha pocas personas en la tabla de transacciones que estan unidas al mismo, creando reglas que tienen niveles de confianza mas bajos que lo estipulado. 
 
 ### Conjunto 2
-#### >> Repetir lo del conjunto uno pero usando otros parámetros <<
+
+#### Selección de parámetros:
+Se utilizan los siguientes parametros:
+
+``` {r}
+soporte <- 0.68085
+confianza <- 0.32372
+tamagnoRegla <- 86
+```
+
+#### Ejecución
+Se generan las reglas a continuación 
+```{r}
+reglas<-apriori(transac, parameter = list(supp=soporte,conf=confianza,maxlen=tamagnoRegla))
+
+inspect(reglas)
+```
+
+```{r}
+# eliminar reglas que son subconjuntos de otras 
+subconjuntos<- which(colSums(is.subset(reglas,reglas))>1)
+  
+reglasFinal<- reglas[-subconjuntos]
+# se ordena por soporte y se observan las primeras 10 reglas
+inspect(sort(reglasFinal,by='support',decreasing = TRUE))
+```
 
 
+#### Descripción de las reglas
+Se procede a visualizar las reglas que se tienen, mayores que la confianza que se definió durante la generacion
 
+```{r fig.align='center'}
+mejoresReglas<- reglasFinal[quality(reglasFinal)$confidence>confianza]
+
+cincoMejoresReglas<- head(mejoresReglas,n=5,by='confidence')
+  
+plot(cincoMejoresReglas,method = 'graph',engine = 'htmlwidget')
+
+```
+
+#### Evaluación del modelo
+
+Se analizan a continuación las 3 primeras reglas:
+``` {r}
+inspect(Top10[1])
+```
+
+En esta regla, se indica que nadie formará parte de un club de política sin importar si forma parte de otro club
+
+``` {r}
+inspect(Top10[2])
+```
+
+Similarmente, nadie formará parte del club de Grupo de Apoyo, sin importar ninguna otra variable
+
+``` {r}
+inspect(Top10[3])
+```
+
+Finalmente, esta regla indica que nadie formará parte de un grupo social
+
+Es de notar que la confianza de las tres reglas es bastante baja, con solo pa primer regla llegando al 90%. Las demas, pese a que son muy comunes, no sobrepasan el umbral del 85%
