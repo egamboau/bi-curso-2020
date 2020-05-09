@@ -1,0 +1,192 @@
+---
+title: 'Tarea #3 Míneria de datos'
+author: "Eduardo Gamboa - Esteban García"
+date: "5/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(arules)
+library(arulesViz)
+library(tidyverse)
+library(plyr)
+library(ggplot2)
+library(knitr)
+library(lubridate)
+```
+
+
+# Entendimiento del negocio
+
+## Determinar los objetivos de minería de datos
+
+### Objetivos de minería de datos
+
+TODO
+
+-Encontrar patrones de co-ocurrencia
+-Asociar grupos de personas
+
+### Criterios de éxito (desde la perspectiva de minería de datos)
+
+TODO
+
+-Encontrar Relaciones poco evidentes
+
+		
+# Fase de entendimiento de los datos
+
+TODO
+
+## Exploración de los datos
+
+Se procede a la carga de los datos 
+
+```{r}
+datos<- read.csv('encuesta.csv',sep=',',dec='.',stringsAsFactors = TRUE)
+
+```
+
+```{r}
+head(datos,5)
+```
+
+TODO poner grafiquitos y analisis 
+
+## Calidad de los datos
+
+Verificamos la cantidad de filas y columnas. Se esperan 12 columnas.
+
+```{r}
+ncol(datos)
+
+nrow(datos)
+
+```
+```{r}
+head(datos,5)
+```
+Vemos que los atributos: Familia, Hobbies, Club_Social, Politica, Profesional, Medioambiente y Grupo_Apoyo se cargan como int pero en realidad son categoricos. Se hace la conversion a factor. 
+
+```{r}
+datos$Familia<-as.factor(datos$Familia)
+datos$Hobbies<-as.factor(datos$Hobbies)
+datos$Club_Social<-as.factor(datos$Club_Social)
+datos$Politica<-as.factor(datos$Politica)
+datos$Profesional<-as.factor(datos$Profesional)
+datos$Medioambiente<-as.factor(datos$Medioambiente)
+datos$Grupo_Apoyo<-as.factor(datos$Grupo_Apoyo)
+```
+
+Buscamos datos nulos
+```{r}
+sum(is.na(datos)) 
+```
+
+Los datos no contienen valores nulos.
+
+Se verifica que las variables númericas Edad y Tiempo_Respuesta tengan valores consistentes (no negativos y aceptables para el contexto) 
+```{r}
+summary(select(datos,c("Edad","Tiempo_Respuesta")))
+```
+Edad tiene valores entre 17 y 57 años, lo cual es aceptable
+Tiempo_Respuesta tiene valores entre 2 y 10 minutos
+
+Se verifica los niveles de los factores para validar que no existan errores tipograficos o valores fuera de lo definido en el diccionario, es decir:
+
+Familia, Hobbies, Club_Social, Politica, Profesional, Medioambiente y Grupo_Apoyo: "0", "1"
+Tiempo_comunidad: "Corto", "Largo" y "Medio"
+Sexo: "F" y "M"
+
+
+```{r}
+sapply(select(datos,-c("Edad","Tiempo_Respuesta")), levels)
+```
+
+el formato de todas las entradas es consistente con la definicion del diccionario de datos.
+
+# Preparación de los datos
+
+## Selección de los datos
+TODO
+seleccion y porque
+
+## Limpieza de los datos
+los datos estan limpios
+
+## Construcción de nuevos datos (atributos)
+No es necesario crear nuevos datos
+
+
+## Transformaciones aplicadas a los datos
+TODO
+Transformar Edad y Tiempo_Respuesta a rangos
+
+# Fase de modelado
+
+## Selección de técnicas
+A priori, pre definida por el contexto de la tarea
+
+## Construcción del modelo
+
+Se generan y analisan dos conjuntos de reglas
+
+### Conjunto 1
+#### Selección de parámetros:
+soporte
+confianza
+tamaño de la regla
+
+#### Ejecución
+Generar reglas
+
+```{r}
+transac<-as(datos[,c(2,3,4,6,7,8,9,10,11,12)],'transactions')
+
+reglas<-apriori(transac, parameter = list(supp=0.1,conf=0.85,maxlen=10))
+
+inspect(reglas[1:10])
+```
+
+
+Eliminar subconjuntos
+```{r}
+# eliminar reglas que son subconjuntos de otras 
+subconjuntos<- which(colSums(is.subset(reglas,reglas))>1)
+  
+reglasFinal<- reglas[-subconjuntos]
+
+
+# se ordena por soporte y se observan las primeras 10 reglas
+inspect(sort(reglasFinal,by='support',decreasing = TRUE)[1:10])
+```
+#### Descripción de las reglas
+generar gráfico
+
+
+```{r fig.align='center'}
+# se filtran las reglas con confianza superior a 0.85
+mejoresReglas<- reglasFinal[quality(reglasFinal)$confidence>0.85]
+
+cincoMejoresReglas<- head(mejoresReglas,n=5,by='confidence')
+  
+plot(cincoMejoresReglas,method = 'graph',engine = 'htmlwidget')
+
+```
+```{r fig.align='center'}
+  Top10<-head(mejoresReglas,n=10,by='confidence')
+  
+  plot(Top10,method ='paracoord')
+```
+#### Evaluación del modelo
+mostrar y analizar las tres mejores reglas
+
+
+
+### Conjunto 2
+#### >> Repetir lo del conjunto uno pero usando otros parámetros <<
+
+
+
