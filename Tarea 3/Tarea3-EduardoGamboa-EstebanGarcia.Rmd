@@ -124,6 +124,7 @@ Haciendo el mismo análisis alrededor del sexo de la persona:
 ```{r}
 barplot(table(datos$Sexo), main = "Sexo de los encuestados", xlab = "Sexo", ylab="Encuestados")
 ```
+
 Se puede ver que la encuesta esta bien distribuida, con casi un 50% de personas en cada sexo, si bien es cierto, hay un poco mas de encuestados del sexo femenino, la diferencia no es notable en la visualización. 
 
 Se analiza además cuales son tiempos en los cuales las personas encuestadas viven en la comunidad:
