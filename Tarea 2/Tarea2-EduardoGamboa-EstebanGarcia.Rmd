@@ -15,21 +15,20 @@ Nota: Debido a la dificultad de obtener datos de negocios, se procede a realizar
 
 ## Determinar los objetivos de negocio
 
-Una empresa aseguradora de renombre desea expandirse en un mercado nuevo de seguros, del cual hay evidencia que la competencia está usando. Dicho mercado es la venta de seguros a casas rodantes, es decir, de vehículos automotores que tienen capacidad de poder vivir en los mismos. A fin de poder entrar en el negocio, es necesario crear mercados publicitarios y encontrar un nicho de mercado que pueda ser explotado.
+Una empresa aseguradora de renombre desea expandirse en un mercado nuevo de seguros, del cual hay evidencia que la competencia está explotando. Dicho mercado es la venta de seguros a casas rodantes, es decir, de vehículos automotores acondicionados para que personas puedan vivir en ellos. A fin de poder entrar en el negocio, es necesario enfocar la oferta del producto a clientes nuevos, y a su vez, encontrar posibles interesados en la cartera de clientes actuales de la empresa.
 
-Uno de los posibles planes de la compañía es realizar un escrutinio de los clientes actuales, y poder determinar si es posible que ellos compren el nuevo seguro que se desea. Para esto, se requiere crear un modelo que pueda determinar si, dadas ciertas características geográficas y de estado, puedan comprar el seguro o no. 
 
 ### Objetivos de negocio
 
 Hay dos objetivos primordiales para el negocio, los cuales se pueden solventar con el diseño descrito en este documento. Estos son: 
 
-1. Poder determinar si algún cliente actual es un posible comprador del nuevo seguro
+1. Poder determinar si dentro de los clientes actuales de la aseguradora hay posibles compradores del nuevo seguro para casa rodantes.
 
-2. Poder determinar, por medio de una aplicación en los equipos de ventas, si un nuevo cliente puede ser un nuevo comprador potencial del nuevo seguro de caravanas. 
+2. Poder determinar si un nuevo cliente, que se acerca a la empresa para contratar otro tipo de servicio, puede estar también interesado en el nuevo seguro de caravanas. 
 
 ### Criterios de éxito (en términos de negocio)
 
-Para considerar este proyecto exitoso desde el punto de vista del negocio, se debe de poder determinar si la persona que se entrevista o estudia es un cliente potencial del seguro de caravanas, basado en los patrones de otros clientes que tienen dicho producto de la competencia. Primeramente, se desea hacer un plan piloto con los clientes actuales, realizando un estudio de quienes tienen una caravana, y basado en el modelo, predecir si desean un seguro o no. 
+Para considerar este proyecto exitoso desde el punto de vista del negocio, se debe de poder obtener una lista de clientes actuales que puedan tener interes en la nueva linea de seguros, y ademas, debe ser posible para los agentes de ventas tener un mecanizmo que les permita determinar si es relevante ofrecer el seguro de caravanas a un nuevo cliente.
 
 ## Evaluación de la situación actual
 
@@ -381,7 +380,7 @@ En este caso, los clientes que más compraron caravanas son del tipo 33, y del t
 ```{r distribucion_clientes_sin_seguro}
 noCompraronSeguros = datos[datos$CARAVAN == 0,]
 barplot(table(noCompraronSeguros$MOSTYPE),
-        main = "Distribución de tipos de clientes que \ncompraron seguro",
+        main = "Distribución de tipos de clientes que \nno compraron seguro",
         xlab = "Tipo de cliente",
         ylab = "cantidad de clientes")
 ```
@@ -397,6 +396,32 @@ barplot(table(datos$MINKGEM),
 ```
 
 Los dos tipos de ingreso más comunes son el 3 y el 4, que reflejan ingresos en la zona donde se vive con valores entre 24% y 36% (para el caso del valor 3) y un 37% - 49% para el valor 4. 
+
+
+Otro de los valores a considerar es la existencia de seguros contratados por el cliente que tengan similitud con el seguro nuevo, como lo puede ser, seguros para automóviles.
+```{r seguros de automóviles}
+
+noCompraronSeguros = datos[datos$CARAVAN == 1,]
+
+barplot(table(noCompraronSeguros$APERSAUT),
+        main = "Seguros de automóviles para compradores de seguro de caravana",
+        xlab = "Tipo de cliente",
+        ylab = "cantidad de clientes")
+
+```
+
+```{r}
+
+noCompraronSeguros = datos[datos$CARAVAN == 0,]
+
+barplot(table(noCompraronSeguros$APERSAUT),
+        main = "Seguros de automóviles para no compradores de seguro de caravana",
+        xlab = "Tipo de cliente",
+        ylab = "cantidad de clientes")
+
+```
+
+De los dos gráficos anteriores podemos ver que en el grupo de los compradores de seguros de caravana es más frecuente la existencia de seguros para automóviles.
 
 ## Calidad de los datos
 Los datos no contienen variables nulas, sin embargo, la codificación de los mismos es algo confusa según el diccionario de datos dado. Además, es posible notar que los datos se orientan hacia personas que no compraron caravanas, lo que no da una buena opción de poder predecir personas que si compraron caravanas, esto dado de que el modelo aprenderá a predecir casos negativos de manera más exacta que los positivos.
