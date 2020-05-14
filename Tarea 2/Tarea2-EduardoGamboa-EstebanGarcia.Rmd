@@ -90,12 +90,13 @@ Desde la perspectiva de la minería de datos, se espera poder realizar prediccio
 
 ### Evaluación inicial de herramientas y técnicas
 
-Para la realización de este proyecto, utilizarán las siguientes herramientas:
+Para la realización de este proyecto se utilizarán las siguientes herramientas:
 
 - el lenguaje de programación R, a fin de analizar los datos, y el prototipado de los modelos a utilizar. 
-- Se utilizarán dos modelos de clasificación a fin de poder cumplir con ls objetivos propuestos. Los mismos son: 
-  - Regresión logística: En este modelo se tomarán las diferentes variables del set de datos, y se utilizarán para poder realizar la predicción. Parte de la salida del modelo son las variables con mas significancia, por lo que es posible obtenerlas como parte de los entregables
-  - Árboles de decisión: Estos modelos buscan generar una especie de "flujo" en el cual se realizan las predicciones respondiendo a preguntas de verdadero/falso. Esto ayudará a obtener las variables significativas, además de los valores que se desea comparar, a fin de poder determinar los objetivos del proyecto
+- Se utilizarán dos modelos de clasificación a fin de poder cumplir con los objetivos propuestos. Los mismos son: 
+  - Regresión logística: En este modelo se tomarán las diferentes variables del set de datos, y se utilizarán para poder realizar la predicción. Parte de la salida del modelo son las variables con más significancia, por lo que es posible obtenerlas como parte de los entregables
+  - Árboles de decisión: Estos modelos buscan generar una especie de "flujo" en el cual se realizan las predicciones respondiendo a preguntas de verdadero/falso. Esto ayudará a obtener las variables significativas, además de los valores que se desea comparar, a fin de poder determinar los objetivos del proyecto.
+
 
 ### Plan del proyecto (incluya para cada fase los recursos necesarios,tiempo estimado, riesgos y contiengencias)
 
@@ -434,15 +435,16 @@ barplot(table(noCompraronSeguros$APERSAUT),
 
 De los dos gráficos anteriores podemos ver que en el grupo de los compradores de seguros de caravana es más frecuente la existencia de seguros para automóviles.
 
-Otra forma de poder analizar una posible relación entre las familias y los que compran caravanas es, principalmente, el ingreso de las mismas
+Otra forma de poder analizar una posible relación entre las familias y los que compran caravanas es, principalmente, el ingreso de las mismas.
 
 ```{r}
 histogram(~MINKGEM|CARAVAN,data=datos,xlab="Ingreso promedio", main="Ingreso promedio por Seguro Caravana")
 ```
 
-En las distribuciones obtenidas, es posible ber que los ingresos de los que compraron caravanas, es mayor, sin embargo, la diferencia no es tan significativa respecto a los que no adiquirieron el producto. Incluso personas con menor ingreso en promedio compraron seguros. Es de notar que dichos ingresos son por zona, no personales, de donde vive las personas.
+En las distribuciones obtenidas, es posible ver que los ingresos de los que compraron caravanas, es mayor, sin embargo, la diferencia no es tan significativa respecto a los que no adquirieron el producto. Incluso personas con menor ingreso en promedio compraron seguros. Es de notar que dichos ingresos son por zona, no personales, de donde vive las personas.
 
-Finalmente, se puede analizar los demás seguros adquiridos en relación de si compraron o no una caravana. Esto , para poder determinar si hay una relación entre los demás productos y el producto de interés
+Finalmente, se puede analizar los demás seguros adquiridos en relación de si compraron o no una caravana. Esto, para poder determinar si hay una relación entre los demás productos y el producto de interés
+
 
 ```{r}
 #Terceros
@@ -470,12 +472,12 @@ En los gráficos anteriores, no se aprecia alguna diferencia que permita discern
 
 
 ## Calidad de los datos
-Se procede a la busqueda de datos nulos dentro del conjunto de datos
+Se procede a la búsqueda de datos nulos dentro del conjunto de datos
 ```{r} 
 sum(is.na(datos))
 ```
 
-Es claro ver que no se enuentran datos nulos. 
+Es claro ver que no se encuentran datos nulos. 
 
 Se procede a analizar que las variables tengan el rango correcto a nivel de los factores. En primer lugar, la variable del tipo de cliente: 
 
@@ -484,7 +486,8 @@ sapply(select(datos,c("MOSTYPE")), levels)
 ```
 En este caso, los niveles son correctos, se cuentan con los 41 casos deseados. 
 
-En el caso de la variable del numero de casas, se verifica que esta en el dominio correcto
+En el caso de la variable del número de casas, se verifica que está en el dominio correcto
+
 ```{r}
 summary(datos$MAANTHUI)
 ```
@@ -493,9 +496,10 @@ summary(datos$MAANTHUI)
 summary(datos$MGEMOMV)
 ```
 
-Esta variable se encuetra también dentro del rango aceptado. El diccionario de datos original indica que debe de etar de 0 a 6, es claro que en este caso dichas variables no está incuido el último valor
+Esta variable se encuentra también dentro del rango aceptado. El diccionario de datos original indica que debe de estar de 0 a 6, es claro que en este caso dichas variables no está incluido el último valor
 
-Para la variable de Edad Promedio: 
+Para la variable de Edad Promedio:
+
 ```{r}
 sapply(select(datos,c("MGEMLEEF")), levels)
 ```
@@ -509,23 +513,24 @@ sapply(select(datos,c("MOSHOOFD")), levels)
 
 Es observable según el resultado anterior que los niveles incluidos son los correctos, sin omitir o agregar alguno. 
 
-Las siguientes variables comparten su domino, asi que se analizan con una sola llamada
+Las siguientes variables comparten su domino, así que se analizan con una sola llamada
 ```{r}
 
-sapply(select(datos,c("MGODRK", "MGODPR", "MGODOV", "MGODGE", "MRELGE", "MRELSA", "MRELOV", "MFALLEEN", "MFGEKIND", "MFWEKIND", "MOPLHOOG", "MOPLMIDD", "MOPLLAAG", "MBERHOOG", "MBERZELF", "MBERBOER", "MBERMIDD", "MBERARBG", "MBERARBO", "MSKA", "MSKB1", "MSKB2", "MSKC", "MSKD", "MHHUUR", "MHKOOP", "MAUT1", "MAUT2", "MAUT0", "MZFONDS", "MZPART", "MINKM30", "MINK3045", "MINK4575", "MINK7512", "MINK123M", "MINKGEM",)), levels)
+sapply(select(datos,c("MGODRK", "MGODPR", "MGODOV", "MGODGE", "MRELGE", "MRELSA", "MRELOV", "MFALLEEN", "MFGEKIND", "MFWEKIND", "MOPLHOOG", "MOPLMIDD", "MOPLLAAG", "MBERHOOG", "MBERZELF", "MBERBOER", "MBERMIDD", "MBERARBG", "MBERARBO", "MSKA", "MSKB1", "MSKB2", "MSKC", "MSKD", "MHHUUR", "MHKOOP", "MAUT1", "MAUT2", "MAUT0", "MZFONDS", "MZPART", "MINKM30", "MINK3045", "MINK4575", "MINK7512", "MINK123M", "MINKGEM")), levels)
 
 ```
 
-Todas estas variables comparten el dominio de 0 a 9 segun su rango porcentual. Es claro que esto se cumple según la tabla anterior
+Todas estas variables comparten el dominio de 0 a 9 según su rango porcentual. Es claro que esto se cumple según la tabla anterior
 ```{r}
 
-sapply(select(datos,c("MKOOPKLA", "PWAPART", "PWABEDR", "PWALAND", "PPERSAUT", "PBESAUT", "PMOTSCO", "PVRAAUT", "PAANHANG", "PTRACTOR", "PWERKT", "PBROM", "PLEVEN", "PPERSONG", "PGEZONG", "PWAOREG", "PBRAND", "PZEILPL", "PPLEZIER", "PFIETS", "PINBOED", "PBYSTAND",)), levels)
+sapply(select(datos,c("MKOOPKLA", "PWAPART", "PWABEDR", "PWALAND", "PPERSAUT", "PBESAUT", "PMOTSCO", "PVRAAUT", "PAANHANG", "PTRACTOR", "PWERKT", "PBROM", "PLEVEN", "PPERSONG", "PGEZONG", "PWAOREG", "PBRAND", "PZEILPL", "PPLEZIER", "PFIETS", "PINBOED", "PBYSTAND")), levels)
 
 ```
 
-Todos los datos estan dentro del dominio en cuestion. 
+Todos los datos están dentro del dominio en cuestión. 
 
 Finalmente, para las variables numéricas:
+
 ```{r}
 
 summary(datos[c("AWAPART", "AWABEDR", "AWALAND", "APERSAUT", "ABESAUT", "AMOTSCO", "AVRAAUT", "AAANHANG", "ATRACTOR", "AWERKT", "ABROM", "ALEVEN", "APERSONG", "AGEZONG", "AWAOREG", "ABRAND", "AZEILPL", "APLEZIER", "AFIETS", "AINBOED", "ABYSTAND")])
