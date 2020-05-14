@@ -7,6 +7,14 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library("lattice")
+library(tidyverse)
+library(plyr)
+library(ggplot2)
+library(knitr)
+library(lubridate)
+library(comprehenr)
+library(dplyr)
 ```
 
 Nota: Debido a la dificultad de obtener datos de negocios, se procede a realizar un caso ficticio.
@@ -85,6 +93,9 @@ Desde la perspectiva de la minería de datos, se espera poder realizar prediccio
 Para la realización de este proyecto, utilizarán las siguientes herramientas:
 
 - el lenguaje de programación R, a fin de analizar los datos, y el prototipado de los modelos a utilizar. 
+- Se utilizarán dos modelos de clasificación a fin de poder cumplir con ls objetivos propuestos. Los mismos son: 
+  - Regresión logística: En este modelo se tomarán las diferentes variables del set de datos, y se utilizarán para poder realizar la predicción. Parte de la salida del modelo son las variables con mas significancia, por lo que es posible obtenerlas como parte de los entregables
+  - Árboles de decisión: Estos modelos buscan generar una especie de "flujo" en el cual se realizan las predicciones respondiendo a preguntas de verdadero/falso. Esto ayudará a obtener las variables significativas, además de los valores que se desea comparar, a fin de poder determinar los objetivos del proyecto
 
 ### Plan del proyecto (incluya para cada fase los recursos necesarios,tiempo estimado, riesgos y contiengencias)
 
@@ -261,7 +272,7 @@ Además, como notas aclaratorias:
 
 1. Las variables que inician con M son variables de área, no específicas del cliente. Se basan en el código ZIP donde el cliente está ubicado, y reflejan la distribución de la variable en cuestión
 1. Las siguientes columnas comparten su dominio, los valores que solo pertenecen a una sola columna están especificados en la lista anterior:
-    1. Columnas de la 7 a la 42, todas estas se comportan como porcentajes. Los valores se especifican a continuación:
+    1. Columnas de la 6 a la 42, todas estas se comportan como porcentajes. Los valores se especifican a continuación:
         0. 0%
         1. 1 - 10%
         2. 11 - 23%
@@ -283,7 +294,7 @@ Además, como notas aclaratorias:
         7. 5000 a 9999
         8. 10.000 a 19.999
         9. 20.000 o mayor
-    1. Las columnas de la 65  a la 85, son numéricas, con rango de 1 a 12
+    1. Las columnas de la 65  a la 85, son numéricas, con rango de 0 a 12
 
 ## Exploración de los datos
 
@@ -368,7 +379,7 @@ Es claro ver que la gran mayoría de los encuestados no compro un seguro de cara
 
 Seguidamente, entre los que compraron un seguro de caravanas, se procede a realizar un análisis de los tipos de clientes.
 
-```{r gráfico seguros y clientes que adquirieron seguro}
+```{r grafico seguros y clientes que adquirieron seguro}
 compraronSeguros = datos[datos$CARAVAN == 1,]
 barplot(table(compraronSeguros$MOSTYPE),
         main = "Distribución de tipos de clientes que \ncompraron seguro",
@@ -399,7 +410,7 @@ Los dos tipos de ingreso más comunes son el 3 y el 4, que reflejan ingresos en 
 
 
 Otro de los valores a considerar es la existencia de seguros contratados por el cliente que tengan similitud con el seguro nuevo, como lo puede ser, seguros para automóviles.
-```{r seguros de automóviles}
+```{r seguros de automoviles}
 
 noCompraronSeguros = datos[datos$CARAVAN == 1,]
 
@@ -423,6 +434,102 @@ barplot(table(noCompraronSeguros$APERSAUT),
 
 De los dos gráficos anteriores podemos ver que en el grupo de los compradores de seguros de caravana es más frecuente la existencia de seguros para automóviles.
 
-## Calidad de los datos
-Los datos no contienen variables nulas, sin embargo, la codificación de los mismos es algo confusa según el diccionario de datos dado. Además, es posible notar que los datos se orientan hacia personas que no compraron caravanas, lo que no da una buena opción de poder predecir personas que si compraron caravanas, esto dado de que el modelo aprenderá a predecir casos negativos de manera más exacta que los positivos.
+Otra forma de poder analizar una posible relación entre las familias y los que compran caravanas es, principalmente, el ingreso de las mismas
 
+```{r}
+histogram(~MINKGEM|CARAVAN,data=datos,xlab="Ingreso promedio", main="Ingreso promedio por Seguro Caravana")
+```
+
+En las distribuciones obtenidas, es posible ber que los ingresos de los que compraron caravanas, es mayor, sin embargo, la diferencia no es tan significativa respecto a los que no adiquirieron el producto. Incluso personas con menor ingreso en promedio compraron seguros. Es de notar que dichos ingresos son por zona, no personales, de donde vive las personas.
+
+Finalmente, se puede analizar los demás seguros adquiridos en relación de si compraron o no una caravana. Esto , para poder determinar si hay una relación entre los demás productos y el producto de interés
+
+```{r}
+#Terceros
+boxplot(as.integer(datos$AWAPART) ~ datos$CARAVAN, main = "Distribución Seguros de terceros", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Automóviles
+boxplot(as.integer(datos$APERSAUT) ~ datos$CARAVAN, main = "Distribución Seguros de auto", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Camionetas de reparto
+boxplot(as.integer(datos$ABESAUT) ~ datos$CARAVAN, main = "Distribución Seguros de camionetas", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Motocicletas
+boxplot(as.integer(datos$AMOTSCO) ~ datos$CARAVAN, main = "Distribución Seguros de motocicletas", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Camiones
+boxplot(as.integer(datos$AVRAAUT) ~ datos$CARAVAN, main = "Distribución Seguros de camiones", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Seguros de vida
+boxplot(as.integer(datos$ALEVEN) ~ datos$CARAVAN, main = "Distribución Seguros de vida", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Accidentes
+boxplot(as.integer(datos$AGEZONG) ~ datos$CARAVAN, main = "Distribución Seguros de accidentes familiares", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Propiedades
+boxplot(as.integer(datos$AINBOED) ~ datos$CARAVAN, main = "Distribución Seguros de propiedades", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+#Seguro social
+#summary(datos$ABYSTAND)
+boxplot(as.integer(datos$ABYSTAND) ~ datos$CARAVAN, main = "Distribución Seguros de seguro social", ylab = "Cantidad", xlab = "¿Seguro Caravana?")
+```
+
+En los gráficos anteriores, no se aprecia alguna diferencia que permita discernir si el hecho de comprar un seguro determinado, o varios de ellos, implique la compra de un seguro de caravanas particular. 
+
+
+## Calidad de los datos
+Se procede a la busqueda de datos nulos dentro del conjunto de datos
+```{r} 
+sum(is.na(datos))
+```
+
+Es claro ver que no se enuentran datos nulos. 
+
+Se procede a analizar que las variables tengan el rango correcto a nivel de los factores. En primer lugar, la variable del tipo de cliente: 
+
+```{r}
+sapply(select(datos,c("MOSTYPE")), levels)
+```
+En este caso, los niveles son correctos, se cuentan con los 41 casos deseados. 
+
+En el caso de la variable del numero de casas, se verifica que esta en el dominio correcto
+```{r}
+summary(datos$MAANTHUI)
+```
+
+```{r}
+summary(datos$MGEMOMV)
+```
+
+Esta variable se encuetra también dentro del rango aceptado. El diccionario de datos original indica que debe de etar de 0 a 6, es claro que en este caso dichas variables no está incuido el último valor
+
+Para la variable de Edad Promedio: 
+```{r}
+sapply(select(datos,c("MGEMLEEF")), levels)
+```
+
+Se observa que los niveles del factor son correctos, se tienen 6 para distintos tipos de rangos de edad
+
+Para el tipo de cliente principal: 
+```{r}
+sapply(select(datos,c("MOSHOOFD")), levels)
+```
+
+Es observable según el resultado anterior que los niveles incluidos son los correctos, sin omitir o agregar alguno. 
+
+Las siguientes variables comparten su domino, asi que se analizan con una sola llamada
+```{r}
+
+sapply(select(datos,c("MGODRK", "MGODPR", "MGODOV", "MGODGE", "MRELGE", "MRELSA", "MRELOV", "MFALLEEN", "MFGEKIND", "MFWEKIND", "MOPLHOOG", "MOPLMIDD", "MOPLLAAG", "MBERHOOG", "MBERZELF", "MBERBOER", "MBERMIDD", "MBERARBG", "MBERARBO", "MSKA", "MSKB1", "MSKB2", "MSKC", "MSKD", "MHHUUR", "MHKOOP", "MAUT1", "MAUT2", "MAUT0", "MZFONDS", "MZPART", "MINKM30", "MINK3045", "MINK4575", "MINK7512", "MINK123M", "MINKGEM",)), levels)
+
+```
+
+Todas estas variables comparten el dominio de 0 a 9 segun su rango porcentual. Es claro que esto se cumple según la tabla anterior
+```{r}
+
+sapply(select(datos,c("MKOOPKLA", "PWAPART", "PWABEDR", "PWALAND", "PPERSAUT", "PBESAUT", "PMOTSCO", "PVRAAUT", "PAANHANG", "PTRACTOR", "PWERKT", "PBROM", "PLEVEN", "PPERSONG", "PGEZONG", "PWAOREG", "PBRAND", "PZEILPL", "PPLEZIER", "PFIETS", "PINBOED", "PBYSTAND",)), levels)
+
+```
+
+Todos los datos estan dentro del dominio en cuestion. 
+
+Finalmente, para las variables numéricas:
+```{r}
+
+summary(datos[c("AWAPART", "AWABEDR", "AWALAND", "APERSAUT", "ABESAUT", "AMOTSCO", "AVRAAUT", "AAANHANG", "ATRACTOR", "AWERKT", "ABROM", "ALEVEN", "APERSONG", "AGEZONG", "AWAOREG", "ABRAND", "AZEILPL", "APLEZIER", "AFIETS", "AINBOED", "ABYSTAND")])
+
+```
+
+Todas las variables se ajustan a los rangos determinados. 
