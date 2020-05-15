@@ -1,0 +1,167 @@
+---
+title: 'Tarea #4 Web mining y clustering'
+author: "Eduardo Gamboa - Esteban García"
+date: "5/17/2020"
+output: html_document
+---
+
+```{r}
+ library(tibble)
+ library(stringr)
+ library(rvest)
+ library(FactoMineR)
+ library(ggplot2)
+ library(cluster)
+ library(factoextra)
+```
+
+# Fase de entendimiento de los datos
+
+Para está asignación se usará la información disponible en: https://www.worldometers.info/gdp/gdp-by-country/
+
+En ese sitio se encuentran los índices de producto interno bruto (PIB) mundial, publicados por el Banco Mundial. Allí Podemos encontrar la siguiente información en formato tabla html:
+
+* *Country:* nombre del país
+* *GDP nominal:* PIB 
+* *GDP abbrev:* PIB abreviado, 
+* *GDP growth:* Crecimiento porcentual del PIB
+* *Population:* tamaño de población 
+* *Share of World GDP:* porcentaje del GDP mundial
+
+
+```{r}
+#web data source
+url<-'https://www.worldometers.info/gdp/gdp-by-country/'
+
+#Read page
+xmlPage<- read_html(url,encoding = 'UTF-8')  
+  
+#Get tables
+tablesList<- html_table(xmlPage,fill=TRUE)
+  
+#Get the first table
+table<- tablesList[[1]]
+  
+head(table)
+```
+# Preparación de los datos
+
+## Selección de datos
+
+Mantenemos todas las columnas excepto "GDP abbrev" pues la columna "GDP Nominal"  representa la misma información en un formato númerico puro. 
+
+```{r}
+#Remove column "GDP Nominal" 
+table<- table[-c(2)]
+
+head(table)
+```
+## Limpieza de datos
+
+Se hace uso de expresiones regulares para limpiar los datos:
+
+De "GDP (nominal, 2017)" se eliminan los signos "$" y ","
+
+```{r}
+GDP<- str_remove(table$`GDP (nominal, 2017)`,'\\s*\\$')
+GDP<- str_remove_all(GDP,',')
+
+```
+
+De "GDP growth" se elimina el signo "%"
+```{r}
+GDPG<- str_remove(table$`GDP  growth`,'\\s*\\%')
+```
+
+De "Population" se eliminan todas las ","
+```{r}
+POPULATION<- str_remove_all(table$`Population (2017)`, ',')
+```
+
+De "GDP per capita" se eliminan los signos "$" y ","
+```{r}
+GDPPC<- str_remove(table$`GDP  per capita`,'\\s*\\$')
+GDPPC<- str_remove(GDPPC,'\\s*\\%')
+GDPPC<- str_remove_all(GDPPC,',')
+```
+
+De "Share of World GDP" se elimina el signo "%"
+```{r}
+SWGDP<- str_remove(table$`Share of World GDP`,'\\s*\\%')
+```
+
+## Construcción de datos
+No es necesario construir nuevos datos
+
+## Transformaciones aplicadas a los datos
+
+Se transforman todas las columnas de "chr" a "numeric" para que puedan ser procesadas por los algoritmos de clustering
+
+```{r}
+cleanTable<- data.frame(as.numeric(GDP), as.numeric(GDPG), as.numeric(POPULATION), as.numeric(GDPPC), as.numeric(SWGDP))
+```
+
+dataframe con los datos limpios:
+```{r}
+colnames(cleanTable)<-c('PIB $','Crecimiento % PIB','Poblacion', 'PIB per capita $','PIB Mundial %')
+head(cleanTable)
+```
+
+# Fase de modelado
+
+TODO
+
+## Selección de técnicas
+TODO
+## Construcción de cada modelo
+TODO
+## Evaluación de los modelos
+TODO
+
+
+
+Tests de kmeans, graficos y scores
+```{r}
+# kmeans 
+clusters <- kmeans(cleanTable,10,nstart=20)
+
+# cálculo del score Silhouette
+score_sil<- silhouette(clusters$cluster,daisy(cleanTable))
+
+# cálculo del valor óptimo de k usando el score silhouette
+fviz_nbclust(cleanTable,kmeans,method = 'silhouette',k.max = 10)
+
+# cálculo del valor óptimo de k usando el método del codo
+fviz_nbclust(cleanTable,kmeans,method = 'wss',k.max = 10)
+
+# cálculo del valor óptimo de k usando la estadística gap
+fviz_nbclust(cleanTable,kmeans,method = 'gap_stat',k.max = 10)
+```
+
+```{r}
+# kmeans 
+clusters <- kmeans(cleanTable,3,nstart=20)
+
+
+descClusters<- data.frame(clusters$size,clusters$centers)
+descClusters
+
+
+resultado <- data.frame(clusters$cluster,cleanTable)
+resultado
+
+#
+head(descClusters)
+
+ggplot(cleanTable,
+       aes(cleanTable$`PIB $`,cleanTable$`PIB Mundial %`,
+           color = clusters$cluster)) + geom_point()+
+  ggtitle(label='Distribución por cluster')
+
+# otra forma de visualizar los clusters
+fviz_cluster(clusters,data=cleanTable[,c(1,5)],palette='jco',ggtheme = theme_minimal())
+
+clusters
+cleanTable[,c(1,2)]
+
+```
