@@ -5,7 +5,7 @@ date: "5/17/2020"
 output: html_document
 ---
 
-```{r}
+```{r setup, include=FALSE}
  library(tibble)
  library(stringr)
  library(rvest)
@@ -13,6 +13,8 @@ output: html_document
  library(ggplot2)
  library(cluster)
  library(factoextra)
+ library(cluster)
+ library(fpc)
 ```
 
 # Fase de entendimiento de los datos
@@ -52,8 +54,8 @@ Mantenemos todas las columnas excepto "GDP abbrev" pues la columna "GDP Nominal"
 
 ```{r}
 #Remove column "GDP Nominal" 
-table<- table[-c(2)]
-
+drop <- c("GDP (abbrev.)")
+table = table[,!(names(table) %in% drop)]
 head(table)
 ```
 ## Limpieza de datos
@@ -65,17 +67,19 @@ De "GDP (nominal, 2017)" se eliminan los signos "$" y ","
 ```{r}
 GDP<- str_remove(table$`GDP (nominal, 2017)`,'\\s*\\$')
 GDP<- str_remove_all(GDP,',')
-
+table$`GDP (nominal, 2017)`<-GDP
 ```
 
 De "GDP growth" se elimina el signo "%"
 ```{r}
 GDPG<- str_remove(table$`GDP  growth`,'\\s*\\%')
+table$`GDP  growth` <- GDPG
 ```
 
 De "Population" se eliminan todas las ","
 ```{r}
 POPULATION<- str_remove_all(table$`Population (2017)`, ',')
+table$`Population (2017)` <- POPULATION
 ```
 
 De "GDP per capita" se eliminan los signos "$" y ","
@@ -83,11 +87,13 @@ De "GDP per capita" se eliminan los signos "$" y ","
 GDPPC<- str_remove(table$`GDP  per capita`,'\\s*\\$')
 GDPPC<- str_remove(GDPPC,'\\s*\\%')
 GDPPC<- str_remove_all(GDPPC,',')
+table$`GDP  per capita` <- GDPPC
 ```
 
 De "Share of World GDP" se elimina el signo "%"
 ```{r}
 SWGDP<- str_remove(table$`Share of World GDP`,'\\s*\\%')
+table$`Share of World GDP` <- SWGDP
 ```
 
 ## Construcción de datos
@@ -95,73 +101,122 @@ No es necesario construir nuevos datos
 
 ## Transformaciones aplicadas a los datos
 
-Se transforman todas las columnas de "chr" a "numeric" para que puedan ser procesadas por los algoritmos de clustering
+Se transforman todas las columnas de "chr" a "numeric" para que puedan ser procesadas por los algoritmos de clustering. Además, se elimina una columna que es numerica y no es necesaria. 
 
 ```{r}
-cleanTable<- data.frame(as.numeric(GDP), as.numeric(GDPG), as.numeric(POPULATION), as.numeric(GDPPC), as.numeric(SWGDP))
+cleanTable<- data.frame(table[-c(1)])
+cleanTable[,2:6] <- sapply(cleanTable[,2:6],as.numeric)
+rownames(cleanTable) <- cleanTable$Country
+cleanTable$Country <- NULL
 ```
 
 dataframe con los datos limpios:
 ```{r}
-colnames(cleanTable)<-c('PIB $','Crecimiento % PIB','Poblacion', 'PIB per capita $','PIB Mundial %')
 head(cleanTable)
 ```
 
 # Fase de modelado
 
-TODO
-
 ## Selección de técnicas
-TODO
+
+Para el presente trabajo se procederá a utilizar dos algoritmos de clutering diferentes, a saber, el algoritmo de Clustering jerárquico, y un algoritmo de agrupamientos k-medias.
+
+Para el caso del cluter jerárquico, se utillizará una distancia Euclidiana, y para poder agrupar dos elementos se utiliza el promedio de distancia entre los mismos. 
+
 ## Construcción de cada modelo
-TODO
+
+###Clustering Jerárquico
+```{r}
+# calculo de las distancias, utilizando la distancia L2, o euclidiana
+matriz_distancias<- dist(cleanTable,method = 'euclidean')
+
+clustJer_conAvg<- hclust(matriz_distancias,method = 'average')
+plot(clustJer_conAvg)
+```
+
+Es posible crear los grupos a partir del dendograma. Por ejemplo, si necesitamos 3 grupos: 
+```{r}
+cut <- cutree(clustJer_conAvg, k = 3); 
+plot(clustJer_conAvg, hang = -1)
+rect.hclust(clustJer_conAvg, k = 3)
+```
+
+Es claro ver que la mayor parte de los países forman parte forman parte del mismo grupo. A fin de poder observalo de manera mas sencilla, se imprimen los grupos creados:
+```{r}
+cut
+```
+
+Es claro ver que los unicos paises que no pertenecen al grupo 3 son Estados Unidos y China, y los mismos forman grupos independientes entre si. Se forma, con tal de poder realizar comparaciones, 10 grupos con el mismo dendograma
+
+```{r}
+cut_10<- cutree(clustJer_conAvg, k = 10); 
+plot(clustJer_conAvg, hang = -1)
+rect.hclust(clustJer_conAvg, k = 10)
+
+```
+
+Los grupos siguen siendo grandes, se procede a imprimirlos: 
+```{r}
+cut_10
+```
+
+Estados Unidos y China siguen con el mismo comportamiento, sin embargo, ahora Japón y Alemania se prosentan en un grupo por país. La mayor parte de los países forman parte del grupo 10. 
+
+###K medias
+Se procede a craer un modelo de K medias, con los mismos datos. 
+
+__NOTA__ debido a la naturaleza aleatoria del algoritmo, se procede a setear una semilla para tener datos repetibles
+
+```{r}
+set.seed(860529)
+```
+
+
+Se ejecuta el algoritmo con dos tamaños de k, los 3 y 10 grupos anteriores
+```{r}
+clusters_3 <- kmeans(cleanTable,3,nstart=20)
+clusters_10 <- kmeans(cleanTable,10,nstart=20)
+
+descClusters_3<- data.frame(clusters_3$size,clusters_3$centers)
+descClusters_3
+
+descClusters_10<- data.frame(clusters_10$size,clusters_10$centers)
+descClusters_10
+```
+
+Con ambos modelos, se grafican los ds agrupamientos, primeramente el de 3 agrupamientos
+```{r}
+clusplot(cleanTable, clusters_3$cluster, color=TRUE, shade=TRUE, 
+         labels=2, lines=0)
+```
+
+A su vez, se muestran parte de los posibles agrupam
+ientos generados
+```{r}
+resultado_3 <- data.frame(clusters_3$cluster,cleanTable)
+resultado_3
+```
+
+Es posible ver que Estados Unidos y China quedaron en el mismo grupo en este caso, y apartados del resto de países, pues sus centroides estan mas alejados. Sin embargo, los grupos de los demás paises estan muy juntos, lo que hace que dichos agrupamientos esten muy juntos entre si. 
+
+
+Para el caso del algoritmo con 10 agrupamientos: 
+
+```{r}
+clusplot(cleanTable, clusters_10$cluster, color=TRUE, shade=TRUE, 
+         labels=2, lines=0)
+```
+
+Y si vemos la tabla de resultados:
+
+```{r}
+resultado_10 <- data.frame(clusters_10$cluster,cleanTable)
+resultado_10
+```
+
+Estados Unidos y china estan igualmente en el un mismo grupo. Los centroides tomados son muy similares, por ende, tambien tiene el efecto de colocar a todos los paises cerca y agrupados hacia la izquierda. Esto no cambia aun si tomamos diferentes numeros para la cantidad de grupos a formar
+
 ## Evaluación de los modelos
-TODO
+Se ve claro que los modelos producen salidas difernetes. En el caso del clustering jerárquico, tiende a separar países que son muy diferentes entre si. Esto se puede apreciar en el caso de China y Estados Unidos, que conforman un grupo cada uno con solo dichos países. Ambos países distan mucho, en espcial en la población, lo que hace posible, a nivel intuitivo, que pertenezcan a grupos diferentes. Sin embargo, el algoritmo de k-medias trata con la distancia entre los vectores, por lo que puede parecer agrupar a los paises 
 
-
-
-Tests de kmeans, graficos y scores
-```{r}
-# kmeans 
-clusters <- kmeans(cleanTable,10,nstart=20)
-
-# cálculo del score Silhouette
-score_sil<- silhouette(clusters$cluster,daisy(cleanTable))
-
-# cálculo del valor óptimo de k usando el score silhouette
-fviz_nbclust(cleanTable,kmeans,method = 'silhouette',k.max = 10)
-
-# cálculo del valor óptimo de k usando el método del codo
-fviz_nbclust(cleanTable,kmeans,method = 'wss',k.max = 10)
-
-# cálculo del valor óptimo de k usando la estadística gap
-fviz_nbclust(cleanTable,kmeans,method = 'gap_stat',k.max = 10)
-```
-
-```{r}
-# kmeans 
-clusters <- kmeans(cleanTable,3,nstart=20)
-
-
-descClusters<- data.frame(clusters$size,clusters$centers)
-descClusters
-
-
-resultado <- data.frame(clusters$cluster,cleanTable)
-resultado
-
-#
-head(descClusters)
-
-ggplot(cleanTable,
-       aes(cleanTable$`PIB $`,cleanTable$`PIB Mundial %`,
-           color = clusters$cluster)) + geom_point()+
-  ggtitle(label='Distribución por cluster')
-
-# otra forma de visualizar los clusters
-fviz_cluster(clusters,data=cleanTable[,c(1,5)],palette='jco',ggtheme = theme_minimal())
-
-clusters
-cleanTable[,c(1,2)]
-
-```
+Por otro lado, k medias permite discernir que dos o mas grupos son mas bien muy cercanos, por lo que no tiene mucho sentido separarlos. 
