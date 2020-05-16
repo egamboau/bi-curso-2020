@@ -125,7 +125,7 @@ Para el caso del cluter jerárquico, se utillizará una distancia Euclidiana, y 
 
 ## Construcción de cada modelo
 
-###Clustering Jerárquico
+### Clustering Jerárquico
 ```{r}
 # calculo de las distancias, utilizando la distancia L2, o euclidiana
 matriz_distancias<- dist(cleanTable,method = 'euclidean')
@@ -162,7 +162,8 @@ cut_10
 
 Estados Unidos y China siguen con el mismo comportamiento, sin embargo, ahora Japón y Alemania se prosentan en un grupo por país. La mayor parte de los países forman parte del grupo 10. 
 
-###K medias
+### K medias
+
 Se procede a craer un modelo de K medias, con los mismos datos. 
 
 __NOTA__ debido a la naturaleza aleatoria del algoritmo, se procede a setear una semilla para tener datos repetibles
