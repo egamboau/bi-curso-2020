@@ -121,7 +121,7 @@ head(cleanTable)
 
 Para el presente trabajo se procederá a utilizar dos algoritmos de clutering diferentes, a saber, el algoritmo de Clustering jerárquico, y un algoritmo de agrupamientos k-medias.
 
-Para el caso del cluter jerárquico, se utillizará una distancia Euclidiana, y para poder agrupar dos elementos se utiliza el promedio de distancia entre los mismos. 
+Para el caso del cluter jerárquico, se utilizará una distancia Euclidiana, y para poder agrupar dos elementos se utiliza el promedio de distancia entre los mismos. 
 
 ## Construcción de cada modelo
 
@@ -141,12 +141,12 @@ plot(clustJer_conAvg, hang = -1)
 rect.hclust(clustJer_conAvg, k = 3)
 ```
 
-Es claro ver que la mayor parte de los países forman parte forman parte del mismo grupo. A fin de poder observalo de manera mas sencilla, se imprimen los grupos creados:
+Es claro ver que la mayor parte de los países forman parte forman parte del mismo grupo. A fin de poder observarlo de manera más sencilla, se imprimen los grupos creados:
 ```{r}
 cut
 ```
 
-Es claro ver que los unicos paises que no pertenecen al grupo 3 son Estados Unidos y China, y los mismos forman grupos independientes entre si. Se forma, con tal de poder realizar comparaciones, 10 grupos con el mismo dendograma
+Es claro ver que los únicos países que no pertenecen al grupo 3 son Estados Unidos y China, y los mismos forman grupos independientes entre sí. Se forma, con tal de poder realizar comparaciones, 10 grupos con el mismo dendograma
 
 ```{r}
 cut_10<- cutree(clustJer_conAvg, k = 10); 
@@ -160,13 +160,13 @@ Los grupos siguen siendo grandes, se procede a imprimirlos:
 cut_10
 ```
 
-Estados Unidos y China siguen con el mismo comportamiento, sin embargo, ahora Japón y Alemania se prosentan en un grupo por país. La mayor parte de los países forman parte del grupo 10. 
+Estados Unidos y China siguen con el mismo comportamiento, sin embargo, ahora Japón y Alemania se presentan en un grupo por país. La mayor parte de los países forman parte del grupo 10. 
 
 ### K medias
 
-Se procede a craer un modelo de K medias, con los mismos datos. 
+Se procede a crear un modelo de K medias, con los mismos datos. 
 
-__NOTA__ debido a la naturaleza aleatoria del algoritmo, se procede a setear una semilla para tener datos repetibles
+__NOTA__ debido a la naturaleza aleatoria del algoritmo, se procede a establecer una semilla para tener datos repetibles
 
 ```{r}
 set.seed(860529)
@@ -185,20 +185,19 @@ descClusters_10<- data.frame(clusters_10$size,clusters_10$centers)
 descClusters_10
 ```
 
-Con ambos modelos, se grafican los ds agrupamientos, primeramente el de 3 agrupamientos
+Con ambos modelos, se grafican los dos agrupamientos, primeramente el de 3 agrupamientos
 ```{r}
 clusplot(cleanTable, clusters_3$cluster, color=TRUE, shade=TRUE, 
          labels=2, lines=0)
 ```
 
-A su vez, se muestran parte de los posibles agrupam
-ientos generados
+A su vez, se muestran parte de los posibles agrupamientos generados
 ```{r}
 resultado_3 <- data.frame(clusters_3$cluster,cleanTable)
 resultado_3
 ```
 
-Es posible ver que Estados Unidos y China quedaron en el mismo grupo en este caso, y apartados del resto de países, pues sus centroides estan mas alejados. Sin embargo, los grupos de los demás paises estan muy juntos, lo que hace que dichos agrupamientos esten muy juntos entre si. 
+Es posible ver que Estados Unidos y China quedaron en el mismo grupo en este caso, y apartados del resto de países, pues sus centroides están más alejados. Sin embargo, los grupos de los demás países están muy juntos, lo que hace que dichos agrupamientos estén muy juntos entre sí. 
 
 
 Para el caso del algoritmo con 10 agrupamientos: 
