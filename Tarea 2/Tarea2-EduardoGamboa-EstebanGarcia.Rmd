@@ -711,7 +711,7 @@ regresion.roc <- prediction(regresion.prueba$proba_si, regresion.prueba$CARAVAN)
 auc = as.numeric(performance(regresion.roc, "auc")@y.values)
 ROCR.logistica  <- performance(regresion.roc, "tpr", "fpr")
 plot(ROCR.logistica,
-main = 'Curva ROC - regresion logistica',
+main = 'Curva ROC - regresion logística',
 print.cutoffs.at = seq(0.1, by=0.1),
 colorize=T,
 text.adj = c(-0.2, 1.7))
