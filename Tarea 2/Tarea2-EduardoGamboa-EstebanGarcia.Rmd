@@ -22,6 +22,13 @@ library(rpart.plot)
 library(ROCR)
 library(pROC)
 
+library(corrplot)
+library(RColorBrewer)
+library(detectseparation)
+library(caret)
+
+library(DMwR)
+library(arm)
 options(max.print=999999)
 ```
 
@@ -311,68 +318,68 @@ Se procede a la carga de los datos
 ```{r carga_datos}
 columnas = c('MOSTYPE', 'MAANTHUI', 'MGEMOMV', 'MGEMLEEF', 'MOSHOOFD', 'MGODRK', 'MGODPR', 'MGODOV', 'MGODGE', 'MRELGE', 'MRELSA', 'MRELOV', 'MFALLEEN', 'MFGEKIND', 'MFWEKIND', 'MOPLHOOG', 'MOPLMIDD', 'MOPLLAAG', 'MBERHOOG', 'MBERZELF', 'MBERBOER', 'MBERMIDD', 'MBERARBG', 'MBERARBO', 'MSKA', 'MSKB1', 'MSKB2', 'MSKC', 'MSKD', 'MHHUUR', 'MHKOOP', 'MAUT1', 'MAUT2', 'MAUT0', 'MZFONDS', 'MZPART', 'MINKM30', 'MINK3045', 'MINK4575', 'MINK7512', 'MINK123M', 'MINKGEM', 'MKOOPKLA', 'PWAPART', 'PWABEDR', 'PWALAND', 'PPERSAUT', 'PBESAUT', 'PMOTSCO', 'PVRAAUT', 'PAANHANG', 'PTRACTOR', 'PWERKT', 'PBROM', 'PLEVEN', 'PPERSONG', 'PGEZONG', 'PWAOREG', 'PBRAND', 'PZEILPL', 'PPLEZIER', 'PFIETS', 'PINBOED', 'PBYSTAND', 'AWAPART', 'AWABEDR', 'AWALAND', 'APERSAUT', 'ABESAUT', 'AMOTSCO', 'AVRAAUT', 'AAANHANG', 'ATRACTOR', 'AWERKT', 'ABROM', 'ALEVEN', 'APERSONG', 'AGEZONG', 'AWAOREG', 'ABRAND', 'AZEILPL', 'APLEZIER', 'AFIETS', 'AINBOED', 'ABYSTAND', 'CARAVAN')
 datos = read.table('ticdata2000.txt', header = F, col.names = columnas)
-datos$MOSTYPE <- factor(datos$MOSTYPE, levels = 1:41)
-datos$MGEMLEEF <- factor(datos$MGEMLEEF, levels = 1:6)
-datos$MOSHOOFD <- factor(datos$MOSHOOFD, levels = 1:10)
-datos$MGODRK <- factor(datos$MGODRK, levels = 0:9)
-datos$MGODPR <- factor(datos$MGODPR, levels = 0:9)
-datos$MGODOV <- factor(datos$MGODOV, levels = 0:9)
-datos$MGODGE <- factor(datos$MGODGE, levels = 0:9)
-datos$MRELGE <- factor(datos$MRELGE, levels = 0:9)
-datos$MRELSA <- factor(datos$MRELSA, levels = 0:9)
-datos$MRELOV <- factor(datos$MRELOV, levels = 0:9)
-datos$MFALLEEN <- factor(datos$MFALLEEN, levels = 0:9)
-datos$MFGEKIND <- factor(datos$MFGEKIND, levels = 0:9)
-datos$MFWEKIND <- factor(datos$MFWEKIND, levels = 0:9)
-datos$MOPLHOOG <- factor(datos$MOPLHOOG, levels = 0:9)
-datos$MOPLMIDD <- factor(datos$MOPLMIDD, levels = 0:9)
-datos$MOPLLAAG <- factor(datos$MOPLLAAG, levels = 0:9)
-datos$MBERHOOG <- factor(datos$MBERHOOG, levels = 0:9)
-datos$MBERZELF <- factor(datos$MBERZELF, levels = 0:9)
-datos$MBERBOER <- factor(datos$MBERBOER, levels = 0:9)
-datos$MBERMIDD <- factor(datos$MBERMIDD, levels = 0:9)
-datos$MBERARBG <- factor(datos$MBERARBG, levels = 0:9)
-datos$MBERARBO <- factor(datos$MBERARBO, levels = 0:9)
-datos$MSKA <- factor(datos$MSKA, levels = 0:9)
-datos$MSKB1 <- factor(datos$MSKB1, levels = 0:9)
-datos$MSKB2 <- factor(datos$MSKB2, levels = 0:9)
-datos$MSKC <- factor(datos$MSKC, levels = 0:9)
-datos$MSKD <- factor(datos$MSKD, levels = 0:9)
-datos$MHHUUR <- factor(datos$MHHUUR, levels = 0:9)
-datos$MHKOOP <- factor(datos$MHKOOP, levels = 0:9)
-datos$MAUT1 <- factor(datos$MAUT1, levels = 0:9)
-datos$MAUT2 <- factor(datos$MAUT2, levels = 0:9)
-datos$MAUT0 <- factor(datos$MAUT0, levels = 0:9)
-datos$MZFONDS <- factor(datos$MZFONDS, levels = 0:9)
-datos$MZPART <- factor(datos$MZPART, levels = 0:9)
-datos$MINKM30 <- factor(datos$MINKM30, levels = 0:9)
-datos$MINK3045 <- factor(datos$MINK3045, levels = 0:9)
-datos$MINK4575 <- factor(datos$MINK4575, levels = 0:9)
-datos$MINK7512 <- factor(datos$MINK7512, levels = 0:9)
-datos$MINK123M <- factor(datos$MINK123M, levels = 0:9)
-datos$MINKGEM <- factor(datos$MINKGEM, levels = 0:9)
-datos$MKOOPKLA <- factor(datos$MKOOPKLA, levels = 0:9)
-datos$PWAPART <- factor(datos$PWAPART, levels = 0:9)
-datos$PWABEDR <- factor(datos$PWABEDR, levels = 0:9)
-datos$PWALAND <- factor(datos$PWALAND, levels = 0:9)
-datos$PPERSAUT <- factor(datos$PPERSAUT, levels = 0:9)
-datos$PBESAUT <- factor(datos$PBESAUT, levels = 0:9)
-datos$PMOTSCO <- factor(datos$PMOTSCO, levels = 0:9)
-datos$PVRAAUT <- factor(datos$PVRAAUT, levels = 0:9)
-datos$PAANHANG <- factor(datos$PAANHANG, levels = 0:9)
-datos$PTRACTOR <- factor(datos$PTRACTOR, levels = 0:9)
-datos$PWERKT <- factor(datos$PWERKT, levels = 0:9)
-datos$PBROM <- factor(datos$PBROM, levels = 0:9)
-datos$PLEVEN <- factor(datos$PLEVEN, levels = 0:9)
-datos$PPERSONG <- factor(datos$PPERSONG, levels = 0:9)
-datos$PGEZONG <- factor(datos$PGEZONG, levels = 0:9)
-datos$PWAOREG <- factor(datos$PWAOREG, levels = 0:9)
-datos$PBRAND <- factor(datos$PBRAND, levels = 0:9)
-datos$PZEILPL <- factor(datos$PZEILPL, levels = 0:9)
-datos$PPLEZIER <- factor(datos$PPLEZIER, levels = 0:9)
-datos$PFIETS <- factor(datos$PFIETS, levels = 0:9)
-datos$PINBOED <- factor(datos$PINBOED, levels = 0:9)
-datos$PBYSTAND <- factor(datos$PBYSTAND, levels = 0:9)
+datos$MOSTYPE <- factor(datos$MOSTYPE)
+datos$MGEMLEEF <- factor(datos$MGEMLEEF)
+datos$MOSHOOFD <- factor(datos$MOSHOOFD)
+datos$MGODRK <- factor(datos$MGODRK)
+datos$MGODPR <- factor(datos$MGODPR)
+datos$MGODOV <- factor(datos$MGODOV)
+datos$MGODGE <- factor(datos$MGODGE)
+datos$MRELGE <- factor(datos$MRELGE)
+datos$MRELSA <- factor(datos$MRELSA)
+datos$MRELOV <- factor(datos$MRELOV)
+datos$MFALLEEN <- factor(datos$MFALLEEN)
+datos$MFGEKIND <- factor(datos$MFGEKIND)
+datos$MFWEKIND <- factor(datos$MFWEKIND)
+datos$MOPLHOOG <- factor(datos$MOPLHOOG)
+datos$MOPLMIDD <- factor(datos$MOPLMIDD)
+datos$MOPLLAAG <- factor(datos$MOPLLAAG)
+datos$MBERHOOG <- factor(datos$MBERHOOG)
+datos$MBERZELF <- factor(datos$MBERZELF)
+datos$MBERBOER <- factor(datos$MBERBOER)
+datos$MBERMIDD <- factor(datos$MBERMIDD)
+datos$MBERARBG <- factor(datos$MBERARBG)
+datos$MBERARBO <- factor(datos$MBERARBO)
+datos$MSKA <- factor(datos$MSKA)
+datos$MSKB1 <- factor(datos$MSKB1)
+datos$MSKB2 <- factor(datos$MSKB2)
+datos$MSKC <- factor(datos$MSKC)
+datos$MSKD <- factor(datos$MSKD)
+datos$MHHUUR <- factor(datos$MHHUUR)
+datos$MHKOOP <- factor(datos$MHKOOP)
+datos$MAUT1 <- factor(datos$MAUT1)
+datos$MAUT2 <- factor(datos$MAUT2)
+datos$MAUT0 <- factor(datos$MAUT0)
+datos$MZFONDS <- factor(datos$MZFONDS)
+datos$MZPART <- factor(datos$MZPART)
+datos$MINKM30 <- factor(datos$MINKM30)
+datos$MINK3045 <- factor(datos$MINK3045)
+datos$MINK4575 <- factor(datos$MINK4575)
+datos$MINK7512 <- factor(datos$MINK7512)
+datos$MINK123M <- factor(datos$MINK123M)
+datos$MINKGEM <- factor(datos$MINKGEM)
+datos$MKOOPKLA <- factor(datos$MKOOPKLA)
+datos$PWAPART <- factor(datos$PWAPART)
+datos$PWABEDR <- factor(datos$PWABEDR)
+datos$PWALAND <- factor(datos$PWALAND)
+datos$PPERSAUT <- factor(datos$PPERSAUT)
+datos$PBESAUT <- factor(datos$PBESAUT)
+datos$PMOTSCO <- factor(datos$PMOTSCO)
+datos$PVRAAUT <- factor(datos$PVRAAUT)
+datos$PAANHANG <- factor(datos$PAANHANG)
+datos$PTRACTOR <- factor(datos$PTRACTOR)
+datos$PWERKT <- factor(datos$PWERKT)
+datos$PBROM <- factor(datos$PBROM)
+datos$PLEVEN <- factor(datos$PLEVEN)
+datos$PPERSONG <- factor(datos$PPERSONG)
+datos$PGEZONG <- factor(datos$PGEZONG)
+datos$PWAOREG <- factor(datos$PWAOREG)
+datos$PBRAND <- factor(datos$PBRAND)
+datos$PZEILPL <- factor(datos$PZEILPL)
+datos$PPLEZIER <- factor(datos$PPLEZIER)
+datos$PFIETS <- factor(datos$PFIETS)
+datos$PINBOED <- factor(datos$PINBOED)
+datos$PBYSTAND <- factor(datos$PBYSTAND)
 datos$CARAVAN <- factor(datos$CARAVAN)
 ```
 
@@ -451,6 +458,16 @@ histogram(~MINKGEM|CARAVAN,data=datos,xlab="Ingreso promedio", main="Ingreso pro
 
 En las distribuciones obtenidas, es posible ver que los ingresos de los que compraron caravanas, es mayor, sin embargo, la diferencia no es tan significativa respecto a los que no adquirieron el producto. Incluso personas con menor ingreso en promedio compraron seguros. Es de notar que dichos ingresos son por zona, no personales, de donde vive las personas.
 
+A fin de conocer las correlaciones entre las variables numéricas: 
+
+```{r}
+M <- cor (datos[c("AWAPART", "AWABEDR", "AWALAND", "APERSAUT", "ABESAUT", "AMOTSCO", "AVRAAUT", "AAANHANG", "ATRACTOR", "AWERKT", "ABROM", "ALEVEN", "APERSONG", "AGEZONG", "AWAOREG", "ABRAND", "AZEILPL", "APLEZIER", "AFIETS", "AINBOED", "ABYSTAND")])
+corrplot::corrplot(M, type="upper", order="hclust",
+         col=brewer.pal(n=8, name="RdYlBu"))
+```
+
+No se ven correlacines fuertes en las variables numéricas de los datos que se están analizando. 
+
 Finalmente, se puede analizar los demás seguros adquiridos en relación de si compraron o no una caravana. Esto, para poder determinar si hay una relación entre los demás productos y el producto de interés
 
 
@@ -490,7 +507,7 @@ Es claro ver que no se encuentran datos nulos.
 Se procede a analizar que las variables tengan el rango correcto a nivel de los factores. En primer lugar, la variable del tipo de cliente: 
 
 ```{r}
-sapply(select(datos,c("MOSTYPE")), levels)
+summary(datos$MOSTYPE)
 ```
 En este caso, los niveles son correctos, se cuentan con los 41 casos deseados. 
 
@@ -560,46 +577,58 @@ Todas las variables se ajustan a los rangos determinados.
 
 # Fase de Preparación de los datos
 
-Para este set de datos, no es necesario realizar limpiezas de los mismos, ni es necesaria la creación de nuevos atributos, pues los modelos se encargan de realizar operaciones sobre las variables categóricas. 
+Para este set de datos, no es necesario realizar limpiezas de los mismos, ni es necesaria la creación de nuevos atributos, pues los modelos se encargan de realizar operaciones sobre las variables categóricas.
 
-#Modelado
+Sin embargo, los datos originales representan un desbalanceo de las clases. Esto es notable, tal y como se mostró en la exploración de los datos, pues la mayoria de los datos son 0s, es decir, no comprar el seguro. Para solucionar esto, se creará un nuevo dataframe, igualando la cantidad de personas que no compraron seguro a las que si lo hicieron, realizando undersampling
+
+Estos datos serán generados por medio de un muestreo aleatorio con reemplazo, a partir de los datos originales:
+```{r}
+set.seed(20200526)
+
+datos_sample = SMOTE(CARAVAN ~ ., datos, perc.over = 1200, k = 5, perc.under = 100)
+
+summary(datos_sample)
+
+```
+
+
+# Modelado
 Tal y como se menciona en la sección de tecnicas a aplciar, se procede a aplicar dos modelos de clasificación a los datos.
 
-##Regresión Logística
+## Regresión Logística
 Se procede a crear un modelo de regresión con todas las variables, a fin de indentificar cuales pueden ser mas signigicativas en esta primera iteración. Notese que se utiliza una regresión binomial pues la variable a predecir tiene dos valores posibles únicamente:
 ```{r}
-modelo.logistica <- glm(CARAVAN ~ ., data = datos, family = binomial)
+modelo.logistica <- bayesglm(CARAVAN ~ . ,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
+summary(modelo.logistica)
+```
+Es posible ver que hay variables que no tienen signigicancia, asi que se procede agenerar un nuevo modelo, sin las mismas, a fin de que se eliminen las variables no necesarias
+```{r}
+modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF + MOSHOOFD + MGODRK + MGODOV + MGODGE + MRELGE + MRELOV + MFALLEEN + MFGEKIND + MOPLHOOG + MOPLLAAG + MBERHOOG + MBERMIDD + MBERARBG + MSKA + MSKB1 + MSKB2 + MSKC + MSKD + MAUT1 + MAUT2 + MAUT0 + MINKM30 + MINK4575 + MINK7512 + MINK123M + MKOOPKLA + PWAPART + PPERSAUT + PMOTSCO + PTRACTOR + PLEVEN + PWAOREG + PBRAND + PPLEZIER + APERSAUT + AMOTSCO + ATRACTOR + ABROM + ALEVEN + AWAOREG + APLEZIER,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
 summary(modelo.logistica)
 ```
 
-En la tabla anterior se aprecia que no todas las vaaibles son significantes al producir una predicción. Debido a que las mismas no son útillies, podemos elimnarlas del modelo. Para estto, se toman las variables con una significancia menor a 0.01:
+En este caso, siguen existiendo variables sin significancia, se procede a continuar eliminando
 ```{r}
-modelo.logistica <- glm(CARAVAN ~ ALEVEN + APERSAUT + MAUT0 + MBERARBG + MBERARBO + MBERBOER + MBERHOOG + MBERMIDD + MHHUUR + MINK7512 + MOPLHOOG + MOPLLAAG + MOSTYPE + MSKB2 + PLEVEN + PPERSAUT + PPLEZIER , data = datos, family = binomial)
-summary(modelo.logistica)
-```
-En esta segunda iteración del modelo, el AIC bajo, lo que implica que este segundo modelo se ajusta un poco mejor a los datos. Sin embargo, otras variables han perdido significancia ahora. Se procede a realizar una nueva limpieza del modelo
-```{r}
-modelo.logistica <- glm(CARAVAN ~ ALEVEN + APERSAUT + MAUT0 + MBERARBG  + MHHUUR + MINK7512  + MOPLLAAG  + PLEVEN + PPERSAUT + PPLEZIER , data = datos, family = binomial)
+modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF + MOSHOOFD + MGODRK + MGODOV + MGODGE + MRELGE + MRELOV + MFALLEEN + MFGEKIND + MOPLHOOG + MOPLLAAG + MBERHOOG + MBERMIDD + MBERARBG + MSKA + MSKB1 + MSKB2 + MSKC + MSKD + MAUT1 + MAUT2 + MAUT0 + MINKM30 + MINK4575 + MINK7512 + MINK123M + MKOOPKLA + PWAPART + PPERSAUT + PMOTSCO + PTRACTOR + PLEVEN + PWAOREG + PBRAND + PPLEZIER + APERSAUT + AMOTSCO + ATRACTOR + ABROM  + AWAOREG + APLEZIER,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
 summary(modelo.logistica)
 ```
 
-En esta iteración final, todas las variables aportan algún nivel de significancia, lo que hace que este modelo sea el elegido. Es de notar que el AIC es algo alto, pero ha bajado durante las iteraciones del mismo. Este análisis tambien nos hace ver que variables son ms significativas, y debido a que son categóricas, es posible saber que valores influyen mas en el mismo.
+Vemos aun mas variables sin significancia, se procede a crear un nuevo modelo que las elimine
+```{r}
+modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF  + MGODRK + MGODOV + MGODGE + MRELGE + MRELOV + MFALLEEN + MFGEKIND + MOPLHOOG + MOPLLAAG + MBERHOOG + MBERARBG + MSKA + MSKB1 + MSKB2 + MSKC + MSKD + MAUT1 + MAUT2 + MAUT0 + MINKM30 + MINK4575 + MINK7512 + MINK123M + MKOOPKLA + PWAPART + PPERSAUT + PMOTSCO + PTRACTOR + PLEVEN + PWAOREG + PBRAND + PPLEZIER + APERSAUT + AMOTSCO + ATRACTOR + ABROM  + AWAOREG + APLEZIER,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
+summary(modelo.logistica)
+```
+
+Se aprecia que todas las varibales aportan significancia a la predicción. Se procederá con este modelo generado.
 
 ## Árbol de decision
 Un caso útil para este modelo, tal y como se desribió anteriormente, es el árbol de decisión. Este permitirá que se siga un flujo para determinar quien comprará un seguro o no. Se implementa uno a continuación: 
 ```{r}
-modelo.arbol = rpart(CARAVAN ~ ., data= datos)
+modelo.arbol = rpart(CARAVAN ~ ., data= datos_sample)
 prp(modelo.arbol)
 ```
 
-En este caso, el modelo dice que nadie compra un seguro. Sin embargo, podemos eliminar las variables que no fueron signigicantes basadas en el modelo anterior, pues las demás pueden simplemente meter ruido o ser contradictorias: 
-```{r}
-modelo.arbol = rpart(CARAVAN ~ MGODRK + MGODOV + MGODGE + MOPLHOOG + MBERMIDD + MBERARBG + MBERARBO + MAUT0 + PPERSAUT, data = datos)
-prp(modelo.arbol)
-```
-
-De nuevo, no es posible predecir con un árbol de decisión y las variables dadas. 
-
+Se aprecia que el arbol de decisión no toma todas las variables en consideración
 ## Evaluación de los modelos
 
 Priemro, se cargan y transforman los datos de prueba suministrados: 
@@ -607,79 +636,73 @@ Priemro, se cargan y transforman los datos de prueba suministrados:
 columnas = c('MOSTYPE', 'MAANTHUI', 'MGEMOMV', 'MGEMLEEF', 'MOSHOOFD', 'MGODRK', 'MGODPR', 'MGODOV', 'MGODGE', 'MRELGE', 'MRELSA', 'MRELOV', 'MFALLEEN', 'MFGEKIND', 'MFWEKIND', 'MOPLHOOG', 'MOPLMIDD', 'MOPLLAAG', 'MBERHOOG', 'MBERZELF', 'MBERBOER', 'MBERMIDD', 'MBERARBG', 'MBERARBO', 'MSKA', 'MSKB1', 'MSKB2', 'MSKC', 'MSKD', 'MHHUUR', 'MHKOOP', 'MAUT1', 'MAUT2', 'MAUT0', 'MZFONDS', 'MZPART', 'MINKM30', 'MINK3045', 'MINK4575', 'MINK7512', 'MINK123M', 'MINKGEM', 'MKOOPKLA', 'PWAPART', 'PWABEDR', 'PWALAND', 'PPERSAUT', 'PBESAUT', 'PMOTSCO', 'PVRAAUT', 'PAANHANG', 'PTRACTOR', 'PWERKT', 'PBROM', 'PLEVEN', 'PPERSONG', 'PGEZONG', 'PWAOREG', 'PBRAND', 'PZEILPL', 'PPLEZIER', 'PFIETS', 'PINBOED', 'PBYSTAND', 'AWAPART', 'AWABEDR', 'AWALAND', 'APERSAUT', 'ABESAUT', 'AMOTSCO', 'AVRAAUT', 'AAANHANG', 'ATRACTOR', 'AWERKT', 'ABROM', 'ALEVEN', 'APERSONG', 'AGEZONG', 'AWAOREG', 'ABRAND', 'AZEILPL', 'APLEZIER', 'AFIETS', 'AINBOED', 'ABYSTAND')
 datos.prueba <- read.table('ticeval2000.txt', header = F, col.names = columnas)
 
-datos.prueba$MOSTYPE <- factor(datos.prueba$MOSTYPE, levels = 1:41)
-datos.prueba$MGEMLEEF <- factor(datos.prueba$MGEMLEEF, levels = 1:6)
-datos.prueba$MOSHOOFD <- factor(datos.prueba$MOSHOOFD, levels = 1:10)
-datos.prueba$MGODRK <- factor(datos.prueba$MGODRK, levels = 0:9)
-datos.prueba$MGODPR <- factor(datos.prueba$MGODPR, levels = 0:9)
-datos.prueba$MGODOV <- factor(datos.prueba$MGODOV, levels = 0:9)
-datos.prueba$MGODGE <- factor(datos.prueba$MGODGE, levels = 0:9)
-datos.prueba$MRELGE <- factor(datos.prueba$MRELGE, levels = 0:9)
-datos.prueba$MRELSA <- factor(datos.prueba$MRELSA, levels = 0:9)
-datos.prueba$MRELOV <- factor(datos.prueba$MRELOV, levels = 0:9)
-datos.prueba$MFALLEEN <- factor(datos.prueba$MFALLEEN, levels = 0:9)
-datos.prueba$MFGEKIND <- factor(datos.prueba$MFGEKIND, levels = 0:9)
-datos.prueba$MFWEKIND <- factor(datos.prueba$MFWEKIND, levels = 0:9)
-datos.prueba$MOPLHOOG <- factor(datos.prueba$MOPLHOOG, levels = 0:9)
-datos.prueba$MOPLMIDD <- factor(datos.prueba$MOPLMIDD, levels = 0:9)
-datos.prueba$MOPLLAAG <- factor(datos.prueba$MOPLLAAG, levels = 0:9)
-datos.prueba$MBERHOOG <- factor(datos.prueba$MBERHOOG, levels = 0:9)
-datos.prueba$MBERZELF <- factor(datos.prueba$MBERZELF, levels = 0:9)
-datos.prueba$MBERBOER <- factor(datos.prueba$MBERBOER, levels = 0:9)
-datos.prueba$MBERMIDD <- factor(datos.prueba$MBERMIDD, levels = 0:9)
-datos.prueba$MBERARBG <- factor(datos.prueba$MBERARBG, levels = 0:9)
-datos.prueba$MBERARBO <- factor(datos.prueba$MBERARBO, levels = 0:9)
-datos.prueba$MSKA <- factor(datos.prueba$MSKA, levels = 0:9)
-datos.prueba$MSKB1 <- factor(datos.prueba$MSKB1, levels = 0:9)
-datos.prueba$MSKB2 <- factor(datos.prueba$MSKB2, levels = 0:9)
-datos.prueba$MSKC <- factor(datos.prueba$MSKC, levels = 0:9)
-datos.prueba$MSKD <- factor(datos.prueba$MSKD, levels = 0:9)
-datos.prueba$MHHUUR <- factor(datos.prueba$MHHUUR, levels = 0:9)
-datos.prueba$MHKOOP <- factor(datos.prueba$MHKOOP, levels = 0:9)
-datos.prueba$MAUT1 <- factor(datos.prueba$MAUT1, levels = 0:9)
-datos.prueba$MAUT2 <- factor(datos.prueba$MAUT2, levels = 0:9)
-datos.prueba$MAUT0 <- factor(datos.prueba$MAUT0, levels = 0:9)
-datos.prueba$MZFONDS <- factor(datos.prueba$MZFONDS, levels = 0:9)
-datos.prueba$MZPART <- factor(datos.prueba$MZPART, levels = 0:9)
-datos.prueba$MINKM30 <- factor(datos.prueba$MINKM30, levels = 0:9)
-datos.prueba$MINK3045 <- factor(datos.prueba$MINK3045, levels = 0:9)
-datos.prueba$MINK4575 <- factor(datos.prueba$MINK4575, levels = 0:9)
-datos.prueba$MINK7512 <- factor(datos.prueba$MINK7512, levels = 0:9)
-datos.prueba$MINK123M <- factor(datos.prueba$MINK123M, levels = 0:9)
-datos.prueba$MINKGEM <- factor(datos.prueba$MINKGEM, levels = 0:9)
-datos.prueba$MKOOPKLA <- factor(datos.prueba$MKOOPKLA, levels = 0:9)
-datos.prueba$PWAPART <- factor(datos.prueba$PWAPART, levels = 0:9)
-datos.prueba$PWABEDR <- factor(datos.prueba$PWABEDR, levels = 0:9)
-datos.prueba$PWALAND <- factor(datos.prueba$PWALAND, levels = 0:9)
-datos.prueba$PPERSAUT <- factor(datos.prueba$PPERSAUT, levels = 0:9)
-datos.prueba$PBESAUT <- factor(datos.prueba$PBESAUT, levels = 0:9)
-datos.prueba$PMOTSCO <- factor(datos.prueba$PMOTSCO, levels = 0:9)
-datos.prueba$PVRAAUT <- factor(datos.prueba$PVRAAUT, levels = 0:9)
-datos.prueba$PAANHANG <- factor(datos.prueba$PAANHANG, levels = 0:9)
-datos.prueba$PTRACTOR <- factor(datos.prueba$PTRACTOR, levels = 0:9)
-datos.prueba$PWERKT <- factor(datos.prueba$PWERKT, levels = 0:9)
-datos.prueba$PBROM <- factor(datos.prueba$PBROM, levels = 0:9)
-datos.prueba$PLEVEN <- factor(datos.prueba$PLEVEN, levels = 0:9)
-datos.prueba$PPERSONG <- factor(datos.prueba$PPERSONG, levels = 0:9)
-datos.prueba$PGEZONG <- factor(datos.prueba$PGEZONG, levels = 0:9)
-datos.prueba$PWAOREG <- factor(datos.prueba$PWAOREG, levels = 0:9)
-datos.prueba$PBRAND <- factor(datos.prueba$PBRAND, levels = 0:9)
-datos.prueba$PZEILPL <- factor(datos.prueba$PZEILPL, levels = 0:9)
-datos.prueba$PPLEZIER <- factor(datos.prueba$PPLEZIER, levels = 0:9)
-datos.prueba$PFIETS <- factor(datos.prueba$PFIETS, levels = 0:9)
-datos.prueba$PINBOED <- factor(datos.prueba$PINBOED, levels = 0:9)
-datos.prueba$PBYSTAND <- factor(datos.prueba$PBYSTAND, levels = 0:9)
+datos.prueba$MOSTYPE <- factor(datos.prueba$MOSTYPE)
+datos.prueba$MGEMLEEF <- factor(datos.prueba$MGEMLEEF)
+datos.prueba$MOSHOOFD <- factor(datos.prueba$MOSHOOFD)
+datos.prueba$MGODRK <- factor(datos.prueba$MGODRK)
+datos.prueba$MGODPR <- factor(datos.prueba$MGODPR)
+datos.prueba$MGODOV <- factor(datos.prueba$MGODOV)
+datos.prueba$MGODGE <- factor(datos.prueba$MGODGE)
+datos.prueba$MRELGE <- factor(datos.prueba$MRELGE)
+datos.prueba$MRELSA <- factor(datos.prueba$MRELSA)
+datos.prueba$MRELOV <- factor(datos.prueba$MRELOV)
+datos.prueba$MFALLEEN <- factor(datos.prueba$MFALLEEN)
+datos.prueba$MFGEKIND <- factor(datos.prueba$MFGEKIND)
+datos.prueba$MFWEKIND <- factor(datos.prueba$MFWEKIND)
+datos.prueba$MOPLHOOG <- factor(datos.prueba$MOPLHOOG)
+datos.prueba$MOPLMIDD <- factor(datos.prueba$MOPLMIDD)
+datos.prueba$MOPLLAAG <- factor(datos.prueba$MOPLLAAG)
+datos.prueba$MBERHOOG <- factor(datos.prueba$MBERHOOG)
+datos.prueba$MBERZELF <- factor(datos.prueba$MBERZELF)
+datos.prueba$MBERBOER <- factor(datos.prueba$MBERBOER)
+datos.prueba$MBERMIDD <- factor(datos.prueba$MBERMIDD)
+datos.prueba$MBERARBG <- factor(datos.prueba$MBERARBG)
+datos.prueba$MBERARBO <- factor(datos.prueba$MBERARBO)
+datos.prueba$MSKA <- factor(datos.prueba$MSKA)
+datos.prueba$MSKB1 <- factor(datos.prueba$MSKB1)
+datos.prueba$MSKB2 <- factor(datos.prueba$MSKB2)
+datos.prueba$MSKC <- factor(datos.prueba$MSKC)
+datos.prueba$MSKD <- factor(datos.prueba$MSKD)
+datos.prueba$MHHUUR <- factor(datos.prueba$MHHUUR)
+datos.prueba$MHKOOP <- factor(datos.prueba$MHKOOP)
+datos.prueba$MAUT1 <- factor(datos.prueba$MAUT1)
+datos.prueba$MAUT2 <- factor(datos.prueba$MAUT2)
+datos.prueba$MAUT0 <- factor(datos.prueba$MAUT0)
+datos.prueba$MZFONDS <- factor(datos.prueba$MZFONDS)
+datos.prueba$MZPART <- factor(datos.prueba$MZPART)
+datos.prueba$MINKM30 <- factor(datos.prueba$MINKM30)
+datos.prueba$MINK3045 <- factor(datos.prueba$MINK3045)
+datos.prueba$MINK4575 <- factor(datos.prueba$MINK4575)
+datos.prueba$MINK7512 <- factor(datos.prueba$MINK7512)
+datos.prueba$MINK123M <- factor(datos.prueba$MINK123M)
+datos.prueba$MINKGEM <- factor(datos.prueba$MINKGEM)
+datos.prueba$MKOOPKLA <- factor(datos.prueba$MKOOPKLA)
+datos.prueba$PWAPART <- factor(datos.prueba$PWAPART)
+datos.prueba$PWABEDR <- factor(datos.prueba$PWABEDR)
+datos.prueba$PWALAND <- factor(datos.prueba$PWALAND)
+datos.prueba$PPERSAUT <- factor(datos.prueba$PPERSAUT)
+datos.prueba$PBESAUT <- factor(datos.prueba$PBESAUT)
+datos.prueba$PMOTSCO <- factor(datos.prueba$PMOTSCO)
+datos.prueba$PVRAAUT <- factor(datos.prueba$PVRAAUT)
+datos.prueba$PAANHANG <- factor(datos.prueba$PAANHANG)
+datos.prueba$PTRACTOR <- factor(datos.prueba$PTRACTOR)
+datos.prueba$PWERKT <- factor(datos.prueba$PWERKT)
+datos.prueba$PBROM <- factor(datos.prueba$PBROM)
+datos.prueba$PLEVEN <- factor(datos.prueba$PLEVEN)
+datos.prueba$PPERSONG <- factor(datos.prueba$PPERSONG)
+datos.prueba$PGEZONG <- factor(datos.prueba$PGEZONG)
+datos.prueba$PWAOREG <- factor(datos.prueba$PWAOREG)
+datos.prueba$PBRAND <- factor(datos.prueba$PBRAND)
+datos.prueba$PZEILPL <- factor(datos.prueba$PZEILPL)
+datos.prueba$PPLEZIER <- factor(datos.prueba$PPLEZIER)
+datos.prueba$PFIETS <- factor(datos.prueba$PFIETS)
+datos.prueba$PINBOED <- factor(datos.prueba$PINBOED)
+datos.prueba$PBYSTAND <- factor(datos.prueba$PBYSTAND)
 
-idx.to.remove = datos.prueba$PPERSAUT =="9"
-# remover los factores que solo existen en los datos de prueba
-datos.prueba<- datos.prueba[!(idx.to.remove),]
-##Se cargan los resultados
 datos.resultado = read.table('tictgts2000.txt', header = F, col.names = c("CARAVAN"))
 datos.resultado$CARAVAN = factor(datos.resultado$CARAVAN)
-
-datos.prueba$CARAVAN = datos.resultado[!idx.to.remove,]
-
-regresion.prueba <- datos.prueba
+datos.prueba$CARAVAN <- datos.resultado$CARAVAN
+summary(datos.prueba)
 ```
 
 ### Regresión logística
@@ -687,6 +710,20 @@ regresion.prueba <- datos.prueba
 Se procede a realizar las predicciones, a partir de los datos de prueba suministrados
 
 ```{r}
+regresion.prueba <- datos.prueba
+
+
+to.remove.MSKD = which(regresion.prueba$MSKD == "8")
+to.remove.MAUT2 = which(regresion.prueba$MAUT2 =="9")
+to.remove.MINK7512 = which(regresion.prueba$MINK7512 =="7")
+to.remove.MINK123M = which(regresion.prueba$MINK123M =="6")
+to.remove.PPERSAUT = which(regresion.prueba$PPERSAUT =="9")
+to.remove.PTRACTOR = which(regresion.prueba$PTRACTOR == "7")
+
+# remover los factores que solo existen en los datos de prueba
+regresion.prueba <- regresion.prueba[-c(to.remove.MSKD, to.remove.MAUT2, to.remove.MINK7512, to.remove.MINK123M, to.remove.PPERSAUT, to.remove.PTRACTOR),]
+
+
 regresion.prueba$probabilidades <- predict(modelo.logistica, newdata = regresion.prueba)
 regresion.prueba$proba_si <- predict(modelo.logistica, newdata = regresion.prueba, type = "response")
 tabla.confusion = table(regresion.prueba$CARAVAN, regresion.prueba$proba_si >= 0.5)
@@ -695,6 +732,7 @@ sensibilidad = tabla.confusion[2,"TRUE"] / (sum(tabla.confusion[2]))
 especificidad = tabla.confusion[1,"FALSE"] / (sum(tabla.confusion[1]))
 exactitud = (tabla.confusion[1,"FALSE"] = tabla.confusion[1,"FALSE"]) / nrow(datos.prueba)
 
+tabla.confusion 
 ```
 
 Se obtienen las siguientes medidas respecto a los datos:
@@ -715,7 +753,48 @@ main = 'Curva ROC - regresion logística',
 print.cutoffs.at = seq(0.1, by=0.1),
 colorize=T,
 text.adj = c(-0.2, 1.7))
-
 ```
+
+Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva está mas bien cercana a un ángulo de 45 grados. El área bajo la curva es de `r auc`
+
+### Árbol de decisión
+A continuación se evalua el árbol de decisión
+
+```{r}
+arbol.prueba <- datos.prueba[-c(which(datos.prueba$MSKD == "8"), which(datos.prueba$MAUT2 == "9"), which(datos.prueba$MINK123M == "6"), which(datos.prueba$PWALAND == "1"), which(datos.prueba$PPERSAUT == "9"),which(datos.prueba$PVRAAUT == "7"),which(datos.prueba$PTRACTOR == "7"), which(datos.prueba$PWERKT == "1"),  which(datos.prueba$PZEILPL == "2") ),]
+
+
+predicciones.arbol <- predict(modelo.arbol, newdata = arbol.prueba)
+tabla.confusion <- table(arbol.prueba$CARAVAN, predicciones.arbol[, 2] >= 0.5)
+
+sensibilidad = tabla.confusion[2,"TRUE"] / (sum(tabla.confusion[2]))
+especificidad = tabla.confusion[1,"FALSE"] / (sum(tabla.confusion[1]))
+exactitud = (tabla.confusion[1,"FALSE"] = tabla.confusion[1,"FALSE"]) / nrow(datos.prueba)
+
+tabla.confusion 
+```
+
+Se obtienen las siguientes medidas respecto a los datos con el modelo de :
+
+* Sensibilidad (proporción de los positivos observados cuya predicción es positiva): `r sensibilidad`
+
+* Especifidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
+
+* Exactitud (cantidad de verdaderos positivos y negativos, entre todos los datos de prueba) :  `r exactitud`
+
+Fnalmente, la curva ROC del modelo en cuestión: 
+
+```{r}
+
+roc.arbol <- prediction(predicciones.arbol[, 2], as.numeric(arbol.prueba$CARAVAN) -1)
+ROCR.arbolDecision  <- performance(roc.arbol, "tpr", "fpr")
+auc = as.numeric(performance(roc.arbol, "auc")@y.values)
+plot(ROCR.arbolDecision,
+main = 'Curva ROC - árbol de decisión',
+print.cutoffs.at = seq(0.1, by=0.1),
+colorize=T,
+text.adj = c(-0.2, 1.7))
+```
+
 
 Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva está mas bien cercana a un ángulo de 45 grados. El área bajo la curva es de `r auc`
