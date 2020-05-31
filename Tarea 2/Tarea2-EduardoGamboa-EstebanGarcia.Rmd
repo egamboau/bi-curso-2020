@@ -584,73 +584,6 @@ Sin embargo, los datos originales representan un desbalanceo de las clases. Esto
 Estos datos serán generados por medio de un muestreo aleatorio con reemplazo, a partir de los datos originales:
 
 ```{r}
-datos = read.table('ticdata2000.txt', header = F, col.names = columnas)
-datos$MOSTYPE <- factor(datos$MOSTYPE)
-datos$MGEMLEEF <- factor(datos$MGEMLEEF)
-datos$MOSHOOFD <- factor(datos$MOSHOOFD)
-datos$MGODRK <- factor(datos$MGODRK)
-datos$MGODPR <- factor(datos$MGODPR)
-datos$MGODOV <- factor(datos$MGODOV)
-datos$MGODGE <- factor(datos$MGODGE)
-datos$MRELGE <- factor(datos$MRELGE)
-datos$MRELSA <- factor(datos$MRELSA)
-datos$MRELOV <- factor(datos$MRELOV)
-datos$MFALLEEN <- factor(datos$MFALLEEN)
-datos$MFGEKIND <- factor(datos$MFGEKIND)
-datos$MFWEKIND <- factor(datos$MFWEKIND)
-datos$MOPLHOOG <- factor(datos$MOPLHOOG)
-datos$MOPLMIDD <- factor(datos$MOPLMIDD)
-datos$MOPLLAAG <- factor(datos$MOPLLAAG)
-datos$MBERHOOG <- factor(datos$MBERHOOG)
-datos$MBERZELF <- factor(datos$MBERZELF)
-datos$MBERBOER <- factor(datos$MBERBOER)
-datos$MBERMIDD <- factor(datos$MBERMIDD)
-datos$MBERARBG <- factor(datos$MBERARBG)
-datos$MBERARBO <- factor(datos$MBERARBO)
-datos$MSKA <- factor(datos$MSKA)
-datos$MSKB1 <- factor(datos$MSKB1)
-datos$MSKB2 <- factor(datos$MSKB2)
-datos$MSKC <- factor(datos$MSKC)
-datos$MSKD <- factor(datos$MSKD)
-datos$MHHUUR <- factor(datos$MHHUUR)
-datos$MHKOOP <- factor(datos$MHKOOP)
-datos$MAUT1 <- factor(datos$MAUT1)
-datos$MAUT2 <- factor(datos$MAUT2)
-datos$MAUT0 <- factor(datos$MAUT0)
-datos$MZFONDS <- factor(datos$MZFONDS)
-datos$MZPART <- factor(datos$MZPART)
-datos$MINKM30 <- factor(datos$MINKM30)
-datos$MINK3045 <- factor(datos$MINK3045)
-datos$MINK4575 <- factor(datos$MINK4575)
-datos$MINK7512 <- factor(datos$MINK7512)
-datos$MINK123M <- factor(datos$MINK123M)
-datos$MINKGEM <- factor(datos$MINKGEM)
-datos$MKOOPKLA <- factor(datos$MKOOPKLA)
-datos$PWAPART <- factor(datos$PWAPART)
-datos$PWABEDR <- factor(datos$PWABEDR)
-datos$PWALAND <- factor(datos$PWALAND)
-datos$PPERSAUT <- factor(datos$PPERSAUT)
-datos$PBESAUT <- factor(datos$PBESAUT)
-datos$PMOTSCO <- factor(datos$PMOTSCO)
-datos$PVRAAUT <- factor(datos$PVRAAUT)
-datos$PAANHANG <- factor(datos$PAANHANG)
-datos$PTRACTOR <- factor(datos$PTRACTOR)
-datos$PWERKT <- factor(datos$PWERKT)
-datos$PBROM <- factor(datos$PBROM)
-datos$PLEVEN <- factor(datos$PLEVEN)
-datos$PPERSONG <- factor(datos$PPERSONG)
-datos$PGEZONG <- factor(datos$PGEZONG)
-datos$PWAOREG <- factor(datos$PWAOREG)
-datos$PBRAND <- factor(datos$PBRAND)
-datos$PZEILPL <- factor(datos$PZEILPL)
-datos$PPLEZIER <- factor(datos$PPLEZIER)
-datos$PFIETS <- factor(datos$PFIETS)
-datos$PINBOED <- factor(datos$PINBOED)
-datos$PBYSTAND <- factor(datos$PBYSTAND)
-datos$CARAVAN <- factor(datos$CARAVAN)
-```
-
-```{r}
 set.seed(20200526)
 
 datos_sample = SMOTE(CARAVAN ~ ., datos, perc.over = 1200, k = 5, perc.under = 100)
@@ -877,3 +810,7 @@ Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva es
 La selección del modelo se basa en el AUC del ROC (área bajo la curva), para ambos modelos tenemos valores bajos, inferiores a 0.7, lo que indica que ambos modelos tienen alta probabilidad de introducir errores en la clasificación. 
 
 El modelo de regresión Logística tiene un AUC (`r rlAuc`) ligeramente superior al árbol de decisión  (`r adAuc`) por lo cual seleccionamos regresión logística.
+
+
+# Enlace del Dashboard
+Un dashboard de Tableau, el cual grafica los resultados, se encuentra en el siguiente enlace: https://public.tableau.com/profile/esteban.garcia1832#!/vizhome/Proyecto-EduardoGamboa-EstebanGarcia/Story1?publish=yes

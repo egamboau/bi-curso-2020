@@ -1,0 +1,509 @@
+---
+title: "Proyecto Final"
+author: "Eduardo Gamboa - Esteban García"
+date: "5/31/2020"
+output: ioslides_presentation
+---
+
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(lattice)
+library(tidyverse)
+library(plyr)
+library(ggplot2)
+library(knitr)
+library(lubridate)
+library(comprehenr)
+library(dplyr)
+
+library(rpart)
+library(rpart.plot)
+
+library(ROCR)
+library(pROC)
+
+library(corrplot)
+library(RColorBrewer)
+library(detectseparation)
+library(caret)
+
+library(DMwR)
+library(arm)
+options(max.print=999999)
+```
+
+
+Entendimiento del negocio
+========================================================
+
+## Objetivos de negocio
+
+1. Poder determinar si dentro de los clientes actuales de la aseguradora hay posibles compradores del nuevo seguro para casa rodantes.
+
+2. Poder determinar si un nuevo cliente, que se acerca a la empresa para contratar otro tipo de servicio, puede estar también interesado en el nuevo seguro de caravanas. 
+
+## Criterios de éxito (en términos de negocio)
+
+1. Obtener una lista de clientes actuales que puedan tener interes en la nueva linea de seguros,
+1. Tener un mecanizmo que les permita determinar si es relevante ofrecer el seguro de caravanas a un nuevo cliente.
+
+## Inventario de recursos (datos, personal, TI)
+
+No existen datos que puedan usarse como predicción a nivel interno. Sin embargo, se tienen datos de encuestas y geográficos de clientes actuales de otras aseguradoras, que si ofrecen el producto.
+
+Se cuenta además con dos personas que trabajan en el análisis de datos y crearán los modelos respectivos basado en los mimos, a nivel de prototipo.
+
+## Requerimientos
+
+1. Obtener las variables o atributos que son más relevantes para poder predecir si un cliente desea o no adquirir un seguro de caravanas
+
+2. Dadas dichas variables para una persona cualquiera, determinar si la misma podría estar inclinada a comprar el seguro de caravanas. 
+
+
+## Supuestos
+
+1. Los datos tomados son estadísticamente variados, dado que los mismos fueron recolectados por una compañía externa, no se tiene control sobre los mismos. 
+1. La compañía no realizó modificación alguna de los datos fuente, y que los mismos reflejan las intenciones de los clientes y sus localizaciones.  
+
+## Restricciones
+
+Los datos y resultados no deben de salir de la compañía. Esto cubre incluso si los resultados no son los deseados, pues se contienen datos geográficos y otros indicadores que pueden considerarse privados por ciertos encuestados, aun cuando ellos aprobaron la utilización de dicha información
+
+## Riesgos y contingencias
+
+1. Posible que los datos estén sucios o mal formateados, debido a errores humanos al realizar la digitalización de estos. 
+
+1. Otro riesgo que se puede correr es el hecho de que los clientes mientan en algunas de sus preguntas. Esto es mitigado por el hecho de que es posible que sea un porcentaje pequeño
+
+
+## Beneficios
+
+El beneficio más grande de este proyecto para la compañía es que va a ayudar a analizar un nuevo producto y mercado, del cual aún no se tiene experiencia, y así aumentar la cartera de clientes. Otro beneficio es que da a los ejecutivos de ventas otra herramienta para poder brindar más productos a los clientes actuales.
+
+
+## Objetivos de minería de datos
+
+1. realizar una predicción correcta de un cliente, basado en los datos de entrenamiento y de pruebas que fueron otorgados. 
+
+1. análisis de relevancia de las variables que se recolectaron, a fin de poder determinar cuáles son las más relevantes, y cuáles pueden ser eliminadas al ser redundantes.
+
+
+## Criterios de éxito (desde la perspectiva de minería de datos)
+
+Desde la perspectiva de la minería de datos, se espera poder realizar predicciones con una alta confianza, de al menos un 90%, a fin de poder garantizar que se cumplan los requerimientos de la compañía tanto en el nivel estadístico como en el nivel de exactitud esperado.
+
+
+## Lista de datasets requeridos
+Solamente es requerido un data set, el cual es otorgado por terceros, que incluye las encuestas de las personas que tienen caravanas, y que tienen o no tienen seguros para las mismas. 
+
+Fase de entendimiento de los datos
+========================================================
+## Ubicación de los datasets
+El dataset se encuentra en formato CSV el cual está localizado en los servidores de la compañía de seguros. Se tiene acceso para la descarga de ellos hacia las computadoras locales para su procesamiento
+
+## Método de acceso
+Se accesan los datos directamente, desde un archivo de texto delimitado por comas, almacenado en los equipos locales de la compañía.
+
+
+## Descripción de los datos
+Data set de 87 variables, mayormente categóricas, que explican el contexto de los clietnes tanto personal, como en la región (delimitada por el apartado postal) de dichos clientes. 
+
+
+## Exploración de los datos {.columns-2}
+
+```{r, echo=FALSE}
+columnas = c('MOSTYPE', 'MAANTHUI', 'MGEMOMV', 'MGEMLEEF', 'MOSHOOFD', 'MGODRK', 'MGODPR', 'MGODOV', 'MGODGE', 'MRELGE', 'MRELSA', 'MRELOV', 'MFALLEEN', 'MFGEKIND', 'MFWEKIND', 'MOPLHOOG', 'MOPLMIDD', 'MOPLLAAG', 'MBERHOOG', 'MBERZELF', 'MBERBOER', 'MBERMIDD', 'MBERARBG', 'MBERARBO', 'MSKA', 'MSKB1', 'MSKB2', 'MSKC', 'MSKD', 'MHHUUR', 'MHKOOP', 'MAUT1', 'MAUT2', 'MAUT0', 'MZFONDS', 'MZPART', 'MINKM30', 'MINK3045', 'MINK4575', 'MINK7512', 'MINK123M', 'MINKGEM', 'MKOOPKLA', 'PWAPART', 'PWABEDR', 'PWALAND', 'PPERSAUT', 'PBESAUT', 'PMOTSCO', 'PVRAAUT', 'PAANHANG', 'PTRACTOR', 'PWERKT', 'PBROM', 'PLEVEN', 'PPERSONG', 'PGEZONG', 'PWAOREG', 'PBRAND', 'PZEILPL', 'PPLEZIER', 'PFIETS', 'PINBOED', 'PBYSTAND', 'AWAPART', 'AWABEDR', 'AWALAND', 'APERSAUT', 'ABESAUT', 'AMOTSCO', 'AVRAAUT', 'AAANHANG', 'ATRACTOR', 'AWERKT', 'ABROM', 'ALEVEN', 'APERSONG', 'AGEZONG', 'AWAOREG', 'ABRAND', 'AZEILPL', 'APLEZIER', 'AFIETS', 'AINBOED', 'ABYSTAND', 'CARAVAN')
+datos = read.table('ticdata2000.txt', header = F, col.names = columnas)
+datos$MOSTYPE <- factor(datos$MOSTYPE)
+datos$MGEMLEEF <- factor(datos$MGEMLEEF)
+datos$MOSHOOFD <- factor(datos$MOSHOOFD)
+datos$MGODRK <- factor(datos$MGODRK)
+datos$MGODPR <- factor(datos$MGODPR)
+datos$MGODOV <- factor(datos$MGODOV)
+datos$MGODGE <- factor(datos$MGODGE)
+datos$MRELGE <- factor(datos$MRELGE)
+datos$MRELSA <- factor(datos$MRELSA)
+datos$MRELOV <- factor(datos$MRELOV)
+datos$MFALLEEN <- factor(datos$MFALLEEN)
+datos$MFGEKIND <- factor(datos$MFGEKIND)
+datos$MFWEKIND <- factor(datos$MFWEKIND)
+datos$MOPLHOOG <- factor(datos$MOPLHOOG)
+datos$MOPLMIDD <- factor(datos$MOPLMIDD)
+datos$MOPLLAAG <- factor(datos$MOPLLAAG)
+datos$MBERHOOG <- factor(datos$MBERHOOG)
+datos$MBERZELF <- factor(datos$MBERZELF)
+datos$MBERBOER <- factor(datos$MBERBOER)
+datos$MBERMIDD <- factor(datos$MBERMIDD)
+datos$MBERARBG <- factor(datos$MBERARBG)
+datos$MBERARBO <- factor(datos$MBERARBO)
+datos$MSKA <- factor(datos$MSKA)
+datos$MSKB1 <- factor(datos$MSKB1)
+datos$MSKB2 <- factor(datos$MSKB2)
+datos$MSKC <- factor(datos$MSKC)
+datos$MSKD <- factor(datos$MSKD)
+datos$MHHUUR <- factor(datos$MHHUUR)
+datos$MHKOOP <- factor(datos$MHKOOP)
+datos$MAUT1 <- factor(datos$MAUT1)
+datos$MAUT2 <- factor(datos$MAUT2)
+datos$MAUT0 <- factor(datos$MAUT0)
+datos$MZFONDS <- factor(datos$MZFONDS)
+datos$MZPART <- factor(datos$MZPART)
+datos$MINKM30 <- factor(datos$MINKM30)
+datos$MINK3045 <- factor(datos$MINK3045)
+datos$MINK4575 <- factor(datos$MINK4575)
+datos$MINK7512 <- factor(datos$MINK7512)
+datos$MINK123M <- factor(datos$MINK123M)
+datos$MINKGEM <- factor(datos$MINKGEM)
+datos$MKOOPKLA <- factor(datos$MKOOPKLA)
+datos$PWAPART <- factor(datos$PWAPART)
+datos$PWABEDR <- factor(datos$PWABEDR)
+datos$PWALAND <- factor(datos$PWALAND)
+datos$PPERSAUT <- factor(datos$PPERSAUT)
+datos$PBESAUT <- factor(datos$PBESAUT)
+datos$PMOTSCO <- factor(datos$PMOTSCO)
+datos$PVRAAUT <- factor(datos$PVRAAUT)
+datos$PAANHANG <- factor(datos$PAANHANG)
+datos$PTRACTOR <- factor(datos$PTRACTOR)
+datos$PWERKT <- factor(datos$PWERKT)
+datos$PBROM <- factor(datos$PBROM)
+datos$PLEVEN <- factor(datos$PLEVEN)
+datos$PPERSONG <- factor(datos$PPERSONG)
+datos$PGEZONG <- factor(datos$PGEZONG)
+datos$PWAOREG <- factor(datos$PWAOREG)
+datos$PBRAND <- factor(datos$PBRAND)
+datos$PZEILPL <- factor(datos$PZEILPL)
+datos$PPLEZIER <- factor(datos$PPLEZIER)
+datos$PFIETS <- factor(datos$PFIETS)
+datos$PINBOED <- factor(datos$PINBOED)
+datos$PBYSTAND <- factor(datos$PBYSTAND)
+datos$CARAVAN <- factor(datos$CARAVAN)
+```
+
+```{r , echo=FALSE, out.width =  '350px'}
+barplot(table(datos$CARAVAN), 
+        main="Distribución de compra de seguros",
+        xlab = "Compró un seguro", 
+        ylab="Cantidad")
+```
+
+<p class="forceBreak"></p>
+
+La gran mayoría de los encuestados no compro un seguro de caravanas. Esto podría generar un modelo que identifique un posible nuevo comprador utilizando las diferencias en las variables en cuestión, sin embargo, con una posibilidad más alta de que retorne falsos positivos. 
+
+## Exploración de los datos {.columns-2}
+
+
+```{r , echo=FALSE, out.width =  '350px'}
+compraronSeguros = datos[datos$CARAVAN == 1,]
+barplot(table(compraronSeguros$MOSTYPE),
+        main = "Distribución de tipos de clientes que \ncompraron seguro",
+        xlab = "Tipo de cliente",
+        ylab = "cantidad de clientes")
+```
+ 
+<p class="forceBreak"></p>
+ 
+En este caso, los clientes que más compraron caravanas son del tipo 33, y del tipo 8. Dichos tipos corresponden al tipo de clase baja con grandes familias, y a las familias de clase media. Es posible observar la misma relación, respecto a los que no adquirieron un seguro: 
+
+
+## Exploración de los datos {.columns-2}
+
+```{r , echo=FALSE, out.width =  '350px'}
+noCompraronSeguros = datos[datos$CARAVAN == 0,]
+barplot(table(noCompraronSeguros$MOSTYPE),
+        main = "Distribución de tipos de clientes que \nno compraron seguro",
+        xlab = "Tipo de cliente",
+        ylab = "cantidad de clientes")
+```
+
+<p class="forceBreak"></p>
+
+Para este caso, se observa que la gran mayoría de los que no compraron seguros, son también del tipo 33, familias de clase baja con grandes familias. Es de notar que este tipo de clientes también compraron un seguro según la distribución. Sin embargo, la diferencia en la proporción de los datos indica que el tipo de cliente 33 no es un buen indicador 
+
+## Exploración de los datos {.columns-2}
+
+```{r , echo=FALSE, out.width =  '350px'}
+barplot(table(datos$MINKGEM),
+        main = "Distribución de tipos de ingreso promedio por clientes",
+        xlab = "Tipo de ingreso promedio",
+        ylab = "cantidad de clientes")
+```
+
+<p class="forceBreak"></p>
+
+Los dos tipos de ingreso más comunes son el 3 y el 4, que reflejan ingresos en la zona donde se vive con valores entre 24% y 36% (para el caso del valor 3) y un 37% - 49% para el valor 4. 
+
+
+## Exploración de los datos {.columns-2}
+
+```{r , echo=FALSE, out.width =  '350px'}
+histogram(~MINKGEM|CARAVAN,data=datos,xlab="Ingreso promedio", main="Ingreso promedio por Seguro Caravana")
+```
+
+<p class="forceBreak"></p>
+
+En las distribuciones obtenidas, es posible ver que los ingresos de los que compraron caravanas, es mayor, sin embargo, la diferencia no es tan significativa respecto a los que no adquirieron el producto. Incluso personas con menor ingreso en promedio compraron seguros. Es de notar que dichos ingresos son por zona, no personales, de donde vive las personas.
+
+
+## Exploración de los datos {.columns-2}
+
+```{r , echo=FALSE, out.width =  '350px'}
+M <- cor (datos[c("AWAPART", "AWABEDR", "AWALAND", "APERSAUT", "ABESAUT", "AMOTSCO", "AVRAAUT", "AAANHANG", "ATRACTOR", "AWERKT", "ABROM", "ALEVEN", "APERSONG", "AGEZONG", "AWAOREG", "ABRAND", "AZEILPL", "APLEZIER", "AFIETS", "AINBOED", "ABYSTAND")])
+corrplot::corrplot(M, type="upper", order="hclust",
+         col=brewer.pal(n=8, name="RdYlBu"))
+```
+
+<p class="forceBreak"></p>
+
+No se ven correlaciones fuertes en las variables numéricas de los datos que se están analizando. 
+
+
+## Exploración de los datos
+
+No se aprecia alguna diferencia que permita discernir si el hecho de comprar un seguro determinado, o varios de ellos, implique la compra de un seguro de caravanas particular. 
+
+## Calidad de los datos
+
+* No se encuentran datos nulos. 
+* Las variables categóricas contienen el dominio correcto
+* Las variables numéricas tienen el rango tal y como esta especificado en el diccionario de datos.
+
+Fase de Preparación de los datos
+========================================================
+
+## Limpieza de datos
+No es necesario realizar limpiezas de los mismos, ni es necesaria la creación de nuevos atributos
+
+## Construcción de nuevos datos
+Los datos originales representan un desbalanceo de las clases. Para solucionar esto, se creará un nuevo dataframe, intentando equiparar las clases
+
+Estos datos serán generados por medio de un muestreo aleatorio con reemplazo, a partir de los datos originales:
+
+```{r }
+set.seed(20200526)
+
+datos_sample = SMOTE(CARAVAN ~ ., datos, perc.over = 1200, k = 5, perc.under = 100)
+
+print(paste("Caravan = 0 => " ,nrow(datos_sample[datos_sample$CARAVAN == 0,])))
+print(paste("Caravan = 1 => " ,nrow(datos_sample[datos_sample$CARAVAN == 1,])))
+
+```
+
+Modelado
+========================================================
+
+## Regresión Logística
+
+Se realizaron 4 diferentes iteraciones de creación del modelo, a fin de obtener uno que tuviera la mayor cantidad de variables significativas. El modelo se expresa a continuación: 
+
+```{r}
+modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF  + MGODRK + MGODOV + MGODGE + MRELGE + MRELOV + MFALLEEN + MFGEKIND + MOPLHOOG + MOPLLAAG + MBERHOOG + MBERARBG + MSKA + MSKB1 + MSKB2 + MSKC + MSKD + MAUT1 + MAUT2 + MAUT0 + MINKM30 + MINK4575 + MINK7512 + MINK123M + MKOOPKLA + PWAPART + PPERSAUT + PMOTSCO + PTRACTOR + PLEVEN + PWAOREG + PBRAND + PPLEZIER + APERSAUT + AMOTSCO + ATRACTOR + ABROM  + AWAOREG + APLEZIER,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
+modelo.logistica$formula
+```
+
+Es de notar que solo se utilizan 42 variables de las especificadas en el set de datos completo. 
+
+## Árbol de decisión
+Un caso útil para este modelo, tal y como se describió anteriormente, es el árbol de decisión:
+
+```{r, echo=FALSE}
+modelo.arbol = rpart(CARAVAN ~ ., data= datos_sample)
+prp(modelo.arbol)
+```
+
+
+```{r, echo=FALSE}
+columnas = c('MOSTYPE', 'MAANTHUI', 'MGEMOMV', 'MGEMLEEF', 'MOSHOOFD', 'MGODRK', 'MGODPR', 'MGODOV', 'MGODGE', 'MRELGE', 'MRELSA', 'MRELOV', 'MFALLEEN', 'MFGEKIND', 'MFWEKIND', 'MOPLHOOG', 'MOPLMIDD', 'MOPLLAAG', 'MBERHOOG', 'MBERZELF', 'MBERBOER', 'MBERMIDD', 'MBERARBG', 'MBERARBO', 'MSKA', 'MSKB1', 'MSKB2', 'MSKC', 'MSKD', 'MHHUUR', 'MHKOOP', 'MAUT1', 'MAUT2', 'MAUT0', 'MZFONDS', 'MZPART', 'MINKM30', 'MINK3045', 'MINK4575', 'MINK7512', 'MINK123M', 'MINKGEM', 'MKOOPKLA', 'PWAPART', 'PWABEDR', 'PWALAND', 'PPERSAUT', 'PBESAUT', 'PMOTSCO', 'PVRAAUT', 'PAANHANG', 'PTRACTOR', 'PWERKT', 'PBROM', 'PLEVEN', 'PPERSONG', 'PGEZONG', 'PWAOREG', 'PBRAND', 'PZEILPL', 'PPLEZIER', 'PFIETS', 'PINBOED', 'PBYSTAND', 'AWAPART', 'AWABEDR', 'AWALAND', 'APERSAUT', 'ABESAUT', 'AMOTSCO', 'AVRAAUT', 'AAANHANG', 'ATRACTOR', 'AWERKT', 'ABROM', 'ALEVEN', 'APERSONG', 'AGEZONG', 'AWAOREG', 'ABRAND', 'AZEILPL', 'APLEZIER', 'AFIETS', 'AINBOED', 'ABYSTAND')
+datos.prueba <- read.table('ticeval2000.txt', header = F, col.names = columnas)
+
+datos.prueba$MOSTYPE <- factor(datos.prueba$MOSTYPE)
+datos.prueba$MGEMLEEF <- factor(datos.prueba$MGEMLEEF)
+datos.prueba$MOSHOOFD <- factor(datos.prueba$MOSHOOFD)
+datos.prueba$MGODRK <- factor(datos.prueba$MGODRK)
+datos.prueba$MGODPR <- factor(datos.prueba$MGODPR)
+datos.prueba$MGODOV <- factor(datos.prueba$MGODOV)
+datos.prueba$MGODGE <- factor(datos.prueba$MGODGE)
+datos.prueba$MRELGE <- factor(datos.prueba$MRELGE)
+datos.prueba$MRELSA <- factor(datos.prueba$MRELSA)
+datos.prueba$MRELOV <- factor(datos.prueba$MRELOV)
+datos.prueba$MFALLEEN <- factor(datos.prueba$MFALLEEN)
+datos.prueba$MFGEKIND <- factor(datos.prueba$MFGEKIND)
+datos.prueba$MFWEKIND <- factor(datos.prueba$MFWEKIND)
+datos.prueba$MOPLHOOG <- factor(datos.prueba$MOPLHOOG)
+datos.prueba$MOPLMIDD <- factor(datos.prueba$MOPLMIDD)
+datos.prueba$MOPLLAAG <- factor(datos.prueba$MOPLLAAG)
+datos.prueba$MBERHOOG <- factor(datos.prueba$MBERHOOG)
+datos.prueba$MBERZELF <- factor(datos.prueba$MBERZELF)
+datos.prueba$MBERBOER <- factor(datos.prueba$MBERBOER)
+datos.prueba$MBERMIDD <- factor(datos.prueba$MBERMIDD)
+datos.prueba$MBERARBG <- factor(datos.prueba$MBERARBG)
+datos.prueba$MBERARBO <- factor(datos.prueba$MBERARBO)
+datos.prueba$MSKA <- factor(datos.prueba$MSKA)
+datos.prueba$MSKB1 <- factor(datos.prueba$MSKB1)
+datos.prueba$MSKB2 <- factor(datos.prueba$MSKB2)
+datos.prueba$MSKC <- factor(datos.prueba$MSKC)
+datos.prueba$MSKD <- factor(datos.prueba$MSKD)
+datos.prueba$MHHUUR <- factor(datos.prueba$MHHUUR)
+datos.prueba$MHKOOP <- factor(datos.prueba$MHKOOP)
+datos.prueba$MAUT1 <- factor(datos.prueba$MAUT1)
+datos.prueba$MAUT2 <- factor(datos.prueba$MAUT2)
+datos.prueba$MAUT0 <- factor(datos.prueba$MAUT0)
+datos.prueba$MZFONDS <- factor(datos.prueba$MZFONDS)
+datos.prueba$MZPART <- factor(datos.prueba$MZPART)
+datos.prueba$MINKM30 <- factor(datos.prueba$MINKM30)
+datos.prueba$MINK3045 <- factor(datos.prueba$MINK3045)
+datos.prueba$MINK4575 <- factor(datos.prueba$MINK4575)
+datos.prueba$MINK7512 <- factor(datos.prueba$MINK7512)
+datos.prueba$MINK123M <- factor(datos.prueba$MINK123M)
+datos.prueba$MINKGEM <- factor(datos.prueba$MINKGEM)
+datos.prueba$MKOOPKLA <- factor(datos.prueba$MKOOPKLA)
+datos.prueba$PWAPART <- factor(datos.prueba$PWAPART)
+datos.prueba$PWABEDR <- factor(datos.prueba$PWABEDR)
+datos.prueba$PWALAND <- factor(datos.prueba$PWALAND)
+datos.prueba$PPERSAUT <- factor(datos.prueba$PPERSAUT)
+datos.prueba$PBESAUT <- factor(datos.prueba$PBESAUT)
+datos.prueba$PMOTSCO <- factor(datos.prueba$PMOTSCO)
+datos.prueba$PVRAAUT <- factor(datos.prueba$PVRAAUT)
+datos.prueba$PAANHANG <- factor(datos.prueba$PAANHANG)
+datos.prueba$PTRACTOR <- factor(datos.prueba$PTRACTOR)
+datos.prueba$PWERKT <- factor(datos.prueba$PWERKT)
+datos.prueba$PBROM <- factor(datos.prueba$PBROM)
+datos.prueba$PLEVEN <- factor(datos.prueba$PLEVEN)
+datos.prueba$PPERSONG <- factor(datos.prueba$PPERSONG)
+datos.prueba$PGEZONG <- factor(datos.prueba$PGEZONG)
+datos.prueba$PWAOREG <- factor(datos.prueba$PWAOREG)
+datos.prueba$PBRAND <- factor(datos.prueba$PBRAND)
+datos.prueba$PZEILPL <- factor(datos.prueba$PZEILPL)
+datos.prueba$PPLEZIER <- factor(datos.prueba$PPLEZIER)
+datos.prueba$PFIETS <- factor(datos.prueba$PFIETS)
+datos.prueba$PINBOED <- factor(datos.prueba$PINBOED)
+datos.prueba$PBYSTAND <- factor(datos.prueba$PBYSTAND)
+
+datos.resultado = read.table('tictgts2000.txt', header = F, col.names = c("CARAVAN"))
+datos.resultado$CARAVAN = factor(datos.resultado$CARAVAN)
+datos.prueba$CARAVAN <- datos.resultado$CARAVAN
+```
+
+## Evaluación de Regresión logística
+
+Se procede a realizar las predicciones, a partir de los datos de prueba suministrados
+
+```{r echo=FALSE}
+regresion.prueba <- datos.prueba
+
+
+to.remove.MSKD = which(regresion.prueba$MSKD == "8")
+to.remove.MAUT2 = which(regresion.prueba$MAUT2 =="9")
+to.remove.MINK7512 = which(regresion.prueba$MINK7512 =="7")
+to.remove.MINK123M = which(regresion.prueba$MINK123M =="6")
+to.remove.PPERSAUT = which(regresion.prueba$PPERSAUT =="9")
+to.remove.PTRACTOR = which(regresion.prueba$PTRACTOR == "7")
+
+# remover los factores que solo existen en los datos de prueba
+regresion.prueba <- regresion.prueba[-c(to.remove.MSKD, to.remove.MAUT2, to.remove.MINK7512, to.remove.MINK123M, to.remove.PPERSAUT, to.remove.PTRACTOR),]
+
+
+regresion.prueba$probabilidades <- predict(modelo.logistica, newdata = regresion.prueba)
+regresion.prueba$proba_si <- predict(modelo.logistica, newdata = regresion.prueba, type = "response")
+tabla.confusion = table(regresion.prueba$CARAVAN, regresion.prueba$proba_si >= 0.5)
+
+sensibilidad = tabla.confusion[2,"TRUE"] / (sum(tabla.confusion[2]))
+especificidad = tabla.confusion[1,"FALSE"] / (sum(tabla.confusion[1]))
+exactitud = (tabla.confusion[1,"FALSE"] = tabla.confusion[1,"FALSE"]) / nrow(datos.prueba)
+
+tabla.confusion 
+```
+
+## Evaluación de Regresión logística
+
+Se obtienen las siguientes medidas respecto a los datos:
+
+* Sensibilidad (proporción de los positivos observados cuya predicción es positiva): `r sensibilidad`
+
+* Especificidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
+
+* Exactitud (cantidad de verdaderos positivos y negativos, entre todos los datos de prueba) :  `r exactitud`
+
+
+## Evaluación de Regresión logística {.columns-2}
+
+```{r, echo=FALSE, out.width =  '350px'}
+regresion.roc <- prediction(regresion.prueba$proba_si, regresion.prueba$CARAVAN)
+auc = as.numeric(performance(regresion.roc, "auc")@y.values)
+ROCR.logistica  <- performance(regresion.roc, "tpr", "fpr")
+plot(ROCR.logistica,
+main = 'Curva ROC - regresion logística',
+print.cutoffs.at = seq(0.1, by=0.1),
+colorize=T,
+text.adj = c(-0.2, 1.7))
+rlAuc = auc
+```
+
+<p class="forceBreak"></p>
+
+Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva está mas bien cercana a un ángulo de 45 grados. El área bajo la curva es de `r auc`
+
+## Evaluación de Árbol de decisión
+A continuación se evalúa el árbol de decisión
+
+```{r, echo=FALSE}
+arbol.prueba <- datos.prueba[-c(which(datos.prueba$MSKD == "8"), which(datos.prueba$MAUT2 == "9"), which(datos.prueba$MINK123M == "6"), which(datos.prueba$PWALAND == "1"), which(datos.prueba$PPERSAUT == "9"),which(datos.prueba$PVRAAUT == "7"),which(datos.prueba$PTRACTOR == "7"), which(datos.prueba$PWERKT == "1"),  which(datos.prueba$PZEILPL == "2") ),]
+
+
+predicciones.arbol <- predict(modelo.arbol, newdata = arbol.prueba)
+tabla.confusion <- table(arbol.prueba$CARAVAN, predicciones.arbol[, 2] >= 0.5)
+
+sensibilidad = tabla.confusion[2,"TRUE"] / (sum(tabla.confusion[2]))
+especificidad = tabla.confusion[1,"FALSE"] / (sum(tabla.confusion[1]))
+exactitud = (tabla.confusion[1,"FALSE"] = tabla.confusion[1,"FALSE"]) / nrow(datos.prueba)
+
+tabla.confusion 
+```
+
+
+## Evaluación de Árbol de decisión
+
+Se obtienen las siguientes medidas respecto a los datos con el modelo:
+
+* Sensibilidad (proporción de los positivos observados cuya predicción es positiva): `r sensibilidad`
+
+* Especificidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
+
+* Exactitud (cantidad de verdaderos positivos y negativos, entre todos los datos de prueba) :  `r exactitud`
+
+## Evaluación de Árbol de decisión {.columns-2}
+
+
+```{r, echo=FALSE , out.width =  '350px'}
+
+roc.arbol <- prediction(predicciones.arbol[, 2], as.numeric(arbol.prueba$CARAVAN) -1)
+ROCR.arbolDecision  <- performance(roc.arbol, "tpr", "fpr")
+auc = as.numeric(performance(roc.arbol, "auc")@y.values)
+plot(ROCR.arbolDecision,
+main = 'Curva ROC - árbol de decisión',
+print.cutoffs.at = seq(0.1, by=0.1),
+colorize=T,
+text.adj = c(-0.2, 1.7))
+adAuc = auc
+```
+
+<p class="forceBreak"></p>
+
+Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva está mas bien cercana a un ángulo de 45 grados. El área bajo la curva es de `r auc`
+
+## Selección de modelo
+
+La selección del modelo se basa en el AUC del ROC (área bajo la curva), para ambos modelos tenemos valores bajos, inferiores a 0.7, lo que indica que ambos modelos tienen alta probabilidad de introducir errores en la clasificación. 
+
+El modelo de regresión Logística tiene un AUC (`r rlAuc`) ligeramente superior al árbol de decisión  (`r adAuc`) por lo cual seleccionamos regresión logística.
+
+Dashboard de Tableau
+========================================================
+***
+Un dashboard de Tableau, el cual grafica los resultados, se encuentra en el siguiente enlace: https://public.tableau.com/profile/esteban.garcia1832#!/vizhome/Proyecto-EduardoGamboa-EstebanGarcia/Story1?publish=yes
+
+
