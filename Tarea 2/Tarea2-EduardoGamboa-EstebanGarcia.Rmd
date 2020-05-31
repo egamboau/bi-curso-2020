@@ -577,11 +577,79 @@ Todas las variables se ajustan a los rangos determinados.
 
 # Fase de Preparación de los datos
 
-Para este set de datos, no es necesario realizar limpiezas de los mismos, ni es necesaria la creación de nuevos atributos, pues los modelos se encargan de realizar operaciones sobre las variables categóricas.
+Para este set de datos, no es necesario realizar limpiezas de estos, ni es necesaria la creación de nuevos atributos, pues los modelos se encargan de realizar operaciones sobre las variables categóricas.
 
-Sin embargo, los datos originales representan un desbalanceo de las clases. Esto es notable, tal y como se mostró en la exploración de los datos, pues la mayoria de los datos son 0s, es decir, no comprar el seguro. Para solucionar esto, se creará un nuevo dataframe, igualando la cantidad de personas que no compraron seguro a las que si lo hicieron, realizando undersampling
+Sin embargo, los datos originales representan un desbalanceo de las clases. Esto es notable, tal y como se mostró en la exploración de los datos, pues la mayoría de los datos son 0s, es decir, no comprar el seguro. Para solucionar esto, se creará un nuevo dataframe, igualando la cantidad de personas que no compraron seguro a las que si lo hicieron, realizando undersampling
 
 Estos datos serán generados por medio de un muestreo aleatorio con reemplazo, a partir de los datos originales:
+
+```{r}
+datos = read.table('ticdata2000.txt', header = F, col.names = columnas)
+datos$MOSTYPE <- factor(datos$MOSTYPE)
+datos$MGEMLEEF <- factor(datos$MGEMLEEF)
+datos$MOSHOOFD <- factor(datos$MOSHOOFD)
+datos$MGODRK <- factor(datos$MGODRK)
+datos$MGODPR <- factor(datos$MGODPR)
+datos$MGODOV <- factor(datos$MGODOV)
+datos$MGODGE <- factor(datos$MGODGE)
+datos$MRELGE <- factor(datos$MRELGE)
+datos$MRELSA <- factor(datos$MRELSA)
+datos$MRELOV <- factor(datos$MRELOV)
+datos$MFALLEEN <- factor(datos$MFALLEEN)
+datos$MFGEKIND <- factor(datos$MFGEKIND)
+datos$MFWEKIND <- factor(datos$MFWEKIND)
+datos$MOPLHOOG <- factor(datos$MOPLHOOG)
+datos$MOPLMIDD <- factor(datos$MOPLMIDD)
+datos$MOPLLAAG <- factor(datos$MOPLLAAG)
+datos$MBERHOOG <- factor(datos$MBERHOOG)
+datos$MBERZELF <- factor(datos$MBERZELF)
+datos$MBERBOER <- factor(datos$MBERBOER)
+datos$MBERMIDD <- factor(datos$MBERMIDD)
+datos$MBERARBG <- factor(datos$MBERARBG)
+datos$MBERARBO <- factor(datos$MBERARBO)
+datos$MSKA <- factor(datos$MSKA)
+datos$MSKB1 <- factor(datos$MSKB1)
+datos$MSKB2 <- factor(datos$MSKB2)
+datos$MSKC <- factor(datos$MSKC)
+datos$MSKD <- factor(datos$MSKD)
+datos$MHHUUR <- factor(datos$MHHUUR)
+datos$MHKOOP <- factor(datos$MHKOOP)
+datos$MAUT1 <- factor(datos$MAUT1)
+datos$MAUT2 <- factor(datos$MAUT2)
+datos$MAUT0 <- factor(datos$MAUT0)
+datos$MZFONDS <- factor(datos$MZFONDS)
+datos$MZPART <- factor(datos$MZPART)
+datos$MINKM30 <- factor(datos$MINKM30)
+datos$MINK3045 <- factor(datos$MINK3045)
+datos$MINK4575 <- factor(datos$MINK4575)
+datos$MINK7512 <- factor(datos$MINK7512)
+datos$MINK123M <- factor(datos$MINK123M)
+datos$MINKGEM <- factor(datos$MINKGEM)
+datos$MKOOPKLA <- factor(datos$MKOOPKLA)
+datos$PWAPART <- factor(datos$PWAPART)
+datos$PWABEDR <- factor(datos$PWABEDR)
+datos$PWALAND <- factor(datos$PWALAND)
+datos$PPERSAUT <- factor(datos$PPERSAUT)
+datos$PBESAUT <- factor(datos$PBESAUT)
+datos$PMOTSCO <- factor(datos$PMOTSCO)
+datos$PVRAAUT <- factor(datos$PVRAAUT)
+datos$PAANHANG <- factor(datos$PAANHANG)
+datos$PTRACTOR <- factor(datos$PTRACTOR)
+datos$PWERKT <- factor(datos$PWERKT)
+datos$PBROM <- factor(datos$PBROM)
+datos$PLEVEN <- factor(datos$PLEVEN)
+datos$PPERSONG <- factor(datos$PPERSONG)
+datos$PGEZONG <- factor(datos$PGEZONG)
+datos$PWAOREG <- factor(datos$PWAOREG)
+datos$PBRAND <- factor(datos$PBRAND)
+datos$PZEILPL <- factor(datos$PZEILPL)
+datos$PPLEZIER <- factor(datos$PPLEZIER)
+datos$PFIETS <- factor(datos$PFIETS)
+datos$PINBOED <- factor(datos$PINBOED)
+datos$PBYSTAND <- factor(datos$PBYSTAND)
+datos$CARAVAN <- factor(datos$CARAVAN)
+```
+
 ```{r}
 set.seed(20200526)
 
@@ -592,16 +660,18 @@ summary(datos_sample)
 ```
 
 
+
 # Modelado
-Tal y como se menciona en la sección de tecnicas a aplciar, se procede a aplicar dos modelos de clasificación a los datos.
+Tal y como se menciona en la sección de técnicas a aplicar, se procede a aplicar dos modelos de clasificación a los datos.
 
 ## Regresión Logística
-Se procede a crear un modelo de regresión con todas las variables, a fin de indentificar cuales pueden ser mas signigicativas en esta primera iteración. Notese que se utiliza una regresión binomial pues la variable a predecir tiene dos valores posibles únicamente:
+Se procede a crear un modelo de regresión con todas las variables, a fin de identificar cuales pueden ser más significativas en esta primera iteración. Nótese que se utiliza una regresión binomial pues la variable a predecir tiene dos valores posibles únicamente:
+
 ```{r}
 modelo.logistica <- bayesglm(CARAVAN ~ . ,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
 summary(modelo.logistica)
 ```
-Es posible ver que hay variables que no tienen signigicancia, asi que se procede agenerar un nuevo modelo, sin las mismas, a fin de que se eliminen las variables no necesarias
+Es posible ver que hay variables que no tienen significancia, así que se procede a generar un nuevo modelo, sin las mismas, a fin de que se eliminen las variables no necesarias
 ```{r}
 modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF + MOSHOOFD + MGODRK + MGODOV + MGODGE + MRELGE + MRELOV + MFALLEEN + MFGEKIND + MOPLHOOG + MOPLLAAG + MBERHOOG + MBERMIDD + MBERARBG + MSKA + MSKB1 + MSKB2 + MSKC + MSKD + MAUT1 + MAUT2 + MAUT0 + MINKM30 + MINK4575 + MINK7512 + MINK123M + MKOOPKLA + PWAPART + PPERSAUT + PMOTSCO + PTRACTOR + PLEVEN + PWAOREG + PBRAND + PPLEZIER + APERSAUT + AMOTSCO + ATRACTOR + ABROM + ALEVEN + AWAOREG + APLEZIER,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
 summary(modelo.logistica)
@@ -613,25 +683,26 @@ modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF + MOSHOOFD 
 summary(modelo.logistica)
 ```
 
-Vemos aun mas variables sin significancia, se procede a crear un nuevo modelo que las elimine
+Vemos aún más variables sin significancia, se procede a crear un nuevo modelo que las elimine
 ```{r}
 modelo.logistica <- bayesglm(CARAVAN ~ MOSTYPE + MGEMOMV +  MGEMLEEF  + MGODRK + MGODOV + MGODGE + MRELGE + MRELOV + MFALLEEN + MFGEKIND + MOPLHOOG + MOPLLAAG + MBERHOOG + MBERARBG + MSKA + MSKB1 + MSKB2 + MSKC + MSKD + MAUT1 + MAUT2 + MAUT0 + MINKM30 + MINK4575 + MINK7512 + MINK123M + MKOOPKLA + PWAPART + PPERSAUT + PMOTSCO + PTRACTOR + PLEVEN + PWAOREG + PBRAND + PPLEZIER + APERSAUT + AMOTSCO + ATRACTOR + ABROM  + AWAOREG + APLEZIER,family = binomial, data=datos_sample, maxit=1000,drop.unused.levels   = FALSE)
 summary(modelo.logistica)
 ```
 
-Se aprecia que todas las varibales aportan significancia a la predicción. Se procederá con este modelo generado.
+Se aprecia que todas las variables aportan significancia a la predicción. Se procederá con este modelo generado.
 
-## Árbol de decision
-Un caso útil para este modelo, tal y como se desribió anteriormente, es el árbol de decisión. Este permitirá que se siga un flujo para determinar quien comprará un seguro o no. Se implementa uno a continuación: 
+## Árbol de decisión
+Un caso útil para este modelo, tal y como se describió anteriormente, es el árbol de decisión. Este permitirá que se siga un flujo para determinar quién comprará un seguro o no. Se implementa uno a continuación:
+
 ```{r}
 modelo.arbol = rpart(CARAVAN ~ ., data= datos_sample)
 prp(modelo.arbol)
 ```
 
-Se aprecia que el arbol de decisión no toma todas las variables en consideración
+Se aprecia que el árbol de decisión no toma todas las variables en consideración
 ## Evaluación de los modelos
 
-Priemro, se cargan y transforman los datos de prueba suministrados: 
+Primero, se cargan y transforman los datos de prueba suministrados: 
 ```{r}
 columnas = c('MOSTYPE', 'MAANTHUI', 'MGEMOMV', 'MGEMLEEF', 'MOSHOOFD', 'MGODRK', 'MGODPR', 'MGODOV', 'MGODGE', 'MRELGE', 'MRELSA', 'MRELOV', 'MFALLEEN', 'MFGEKIND', 'MFWEKIND', 'MOPLHOOG', 'MOPLMIDD', 'MOPLLAAG', 'MBERHOOG', 'MBERZELF', 'MBERBOER', 'MBERMIDD', 'MBERARBG', 'MBERARBO', 'MSKA', 'MSKB1', 'MSKB2', 'MSKC', 'MSKD', 'MHHUUR', 'MHKOOP', 'MAUT1', 'MAUT2', 'MAUT0', 'MZFONDS', 'MZPART', 'MINKM30', 'MINK3045', 'MINK4575', 'MINK7512', 'MINK123M', 'MINKGEM', 'MKOOPKLA', 'PWAPART', 'PWABEDR', 'PWALAND', 'PPERSAUT', 'PBESAUT', 'PMOTSCO', 'PVRAAUT', 'PAANHANG', 'PTRACTOR', 'PWERKT', 'PBROM', 'PLEVEN', 'PPERSONG', 'PGEZONG', 'PWAOREG', 'PBRAND', 'PZEILPL', 'PPLEZIER', 'PFIETS', 'PINBOED', 'PBYSTAND', 'AWAPART', 'AWABEDR', 'AWALAND', 'APERSAUT', 'ABESAUT', 'AMOTSCO', 'AVRAAUT', 'AAANHANG', 'ATRACTOR', 'AWERKT', 'ABROM', 'ALEVEN', 'APERSONG', 'AGEZONG', 'AWAOREG', 'ABRAND', 'AZEILPL', 'APLEZIER', 'AFIETS', 'AINBOED', 'ABYSTAND')
 datos.prueba <- read.table('ticeval2000.txt', header = F, col.names = columnas)
@@ -739,7 +810,7 @@ Se obtienen las siguientes medidas respecto a los datos:
 
 * Sensibilidad (proporción de los positivos observados cuya predicción es positiva): `r sensibilidad`
 
-* Especifidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
+* Especificidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
 
 * Exactitud (cantidad de verdaderos positivos y negativos, entre todos los datos de prueba) :  `r exactitud`
 
@@ -753,12 +824,13 @@ main = 'Curva ROC - regresion logística',
 print.cutoffs.at = seq(0.1, by=0.1),
 colorize=T,
 text.adj = c(-0.2, 1.7))
+rlAuc = auc
 ```
 
 Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva está mas bien cercana a un ángulo de 45 grados. El área bajo la curva es de `r auc`
 
 ### Árbol de decisión
-A continuación se evalua el árbol de decisión
+A continuación se evalúa el árbol de decisión
 
 ```{r}
 arbol.prueba <- datos.prueba[-c(which(datos.prueba$MSKD == "8"), which(datos.prueba$MAUT2 == "9"), which(datos.prueba$MINK123M == "6"), which(datos.prueba$PWALAND == "1"), which(datos.prueba$PPERSAUT == "9"),which(datos.prueba$PVRAAUT == "7"),which(datos.prueba$PTRACTOR == "7"), which(datos.prueba$PWERKT == "1"),  which(datos.prueba$PZEILPL == "2") ),]
@@ -774,15 +846,15 @@ exactitud = (tabla.confusion[1,"FALSE"] = tabla.confusion[1,"FALSE"]) / nrow(dat
 tabla.confusion 
 ```
 
-Se obtienen las siguientes medidas respecto a los datos con el modelo de :
+Se obtienen las siguientes medidas respecto a los datos con el modelo de:
 
 * Sensibilidad (proporción de los positivos observados cuya predicción es positiva): `r sensibilidad`
 
-* Especifidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
+* Especificidad (Proporción de los negativos observados cuya predicción es negativa): `r especificidad`
 
 * Exactitud (cantidad de verdaderos positivos y negativos, entre todos los datos de prueba) :  `r exactitud`
 
-Fnalmente, la curva ROC del modelo en cuestión: 
+Finalmente, la curva ROC del modelo en cuestión: 
 
 ```{r}
 
@@ -794,7 +866,14 @@ main = 'Curva ROC - árbol de decisión',
 print.cutoffs.at = seq(0.1, by=0.1),
 colorize=T,
 text.adj = c(-0.2, 1.7))
+adAuc = auc
 ```
 
 
 Es claro ver en la curva ROC que el modelo no es tan eficiente, pues su curva está mas bien cercana a un ángulo de 45 grados. El área bajo la curva es de `r auc`
+
+## Selección de modelo
+
+La selección del modelo se basa en el AUC del ROC (área bajo la curva), para ambos modelos tenemos valores bajos, inferiores a 0.7, lo que indica que ambos modelos tienen alta probabilidad de introducir errores en la clasificación. 
+
+El modelo de regresión Logística tiene un AUC (`r rlAuc`) ligeramente superior al árbol de decisión  (`r adAuc`) por lo cual seleccionamos regresión logística.
